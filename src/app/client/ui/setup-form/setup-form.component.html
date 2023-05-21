@@ -1,0 +1,34 @@
+<form [formGroup]="form" data-cy="form" (ngSubmit)="submitForm()">
+  <mat-form-field>
+    <mat-label>Url</mat-label>
+    <input type="text" matInput formControlName="url" data-cy="urlField" />
+    <mat-error *ngIf="fc['url'].errors" data-cy="urlFieldError">
+      <span *ngIf="fc['url'].hasError('required')">Url field is required</span>
+      <span *ngIf="fc['url'].hasError('invalidWsAddress')"
+        >Url is not a valid ws address</span
+      >
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Config</mat-label>
+    <textarea
+      matInput
+      data-cy="configField"
+      rows="10"
+      formControlName="config"></textarea>
+    <mat-error *ngIf="fc['config'].errors" data-cy="configFieldError">
+      <span *ngIf="fc['config'].hasError('invalidJson')"
+        >Config is not a valid json</span
+      >
+    </mat-error>
+  </mat-form-field>
+  <div>
+    <button
+      mat-raised-button
+      color="primary"
+      data-cy="submitButton"
+      [disabled]="form.invalid">
+      Connect
+    </button>
+  </div>
+</form>
