@@ -3,11 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { WebsocketService } from './websocket.service';
 import { SocketSetup } from '../../models/socket-setup';
 import { io } from 'socket.io-client';
+import { MockProvider } from 'ng-mocks';
+import { LoggerService } from '../logger/logger.service';
 
 jest.mock('socket.io-client');
 
 describe('WebsocketService', () => {
   let service: WebsocketService;
+  let loggerService: LoggerService;
   const socketSetup: SocketSetup = {
     url: 'ws://localhost:3000',
     config: {
@@ -24,8 +27,11 @@ describe('WebsocketService', () => {
   };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [MockProvider(LoggerService)],
+    });
     service = TestBed.inject(WebsocketService);
+    loggerService = TestBed.inject(LoggerService);
   });
 
   it('should be created', () => {
@@ -56,6 +62,17 @@ describe('WebsocketService', () => {
     expect(mockSocket.disconnect).not.toHaveBeenCalled();
     service.init(socketSetup);
     expect(mockSocket.disconnect).toHaveBeenCalled();
+  });
+
+  it('should call disconnect if socket is definied', () => {
+    service.init(socketSetup);
+    service.disconnect();
+    expect(mockSocket.disconnect).toHaveBeenCalled();
+  });
+
+  it('should not call disconnect if socket is undefinied', () => {
+    service.disconnect();
+    expect(mockSocket.disconnect).not.toHaveBeenCalled();
   });
 
   it('should subscribe to specific channel if socket is defined', done => {
@@ -124,5 +141,90 @@ describe('WebsocketService', () => {
       expect(data).toEqual(message);
       done();
     });
+  });
+
+  it('should log socket io connect event', () => {
+    mockSocket.on = jest
+      .fn()
+      .mockImplementation(
+        (params = 'connect', callback: (data: string) => void) => {
+          callback('message');
+        }
+      );
+    jest.spyOn(loggerService, 'success');
+
+    (io as jest.Mock).mockReturnValue(mockSocket);
+    service.init(socketSetup);
+    expect(loggerService.success).toHaveBeenCalledWith(
+      'Successfully connected'
+    );
+  });
+
+  it('should log error socket io connect_error event', () => {
+    mockSocket.on = jest
+      .fn()
+      .mockImplementation(
+        (params = 'connect_error', callback: (data: object) => void) => {
+          callback({ message: 'reason' });
+        }
+      );
+    jest.spyOn(loggerService, 'error');
+
+    (io as jest.Mock).mockReturnValue(mockSocket);
+    service.init(socketSetup);
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Connection error due to reason'
+    );
+  });
+
+  it('should log info socket io reconnect event', () => {
+    mockSocket.on = jest
+      .fn()
+      .mockImplementation(
+        (params = 'reconnect', callback: (data: number) => void) => {
+          callback(5);
+        }
+      );
+    jest.spyOn(loggerService, 'info');
+
+    (io as jest.Mock).mockReturnValue(mockSocket);
+    service.init(socketSetup);
+    expect(loggerService.info).toHaveBeenCalledWith(
+      'Reconnected after 5 attempts'
+    );
+  });
+
+  it('should log warn socket io reconnecting event', () => {
+    mockSocket.on = jest
+      .fn()
+      .mockImplementation(
+        (params = 'reconnecting', callback: (data: number) => void) => {
+          callback(5);
+        }
+      );
+    jest.spyOn(loggerService, 'warn');
+
+    (io as jest.Mock).mockReturnValue(mockSocket);
+    service.init(socketSetup);
+    expect(loggerService.warn).toHaveBeenCalledWith(
+      'Trying to reconnect. Attempt: 5'
+    );
+  });
+
+  it('should log error socket io reconnect_error event', () => {
+    mockSocket.on = jest
+      .fn()
+      .mockImplementation(
+        (params = 'reconnect_error', callback: (data: object) => void) => {
+          callback({ message: 'reason' });
+        }
+      );
+    jest.spyOn(loggerService, 'error');
+
+    (io as jest.Mock).mockReturnValue(mockSocket);
+    service.init(socketSetup);
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Reconnection error due to reason'
+    );
   });
 });

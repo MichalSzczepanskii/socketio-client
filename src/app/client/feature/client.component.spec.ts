@@ -6,31 +6,35 @@ import {
 } from '@angular/core/testing';
 
 import { ClientComponent } from './client.component';
-import { MockComponents, MockProvider } from 'ng-mocks';
+import { MockComponents, MockProviders } from 'ng-mocks';
 import { SetupFormComponent } from '../ui/setup-form/setup-form.component';
 import { By } from '@angular/platform-browser';
-import { Socket } from 'socket.io-client';
-import { findEl, getTestIdSelector } from '../../spec-helper/element.utils';
 import { SocketSetup } from '../data-access/models/socket-setup';
 import { LoggerService } from '../data-access/services/logger/logger.service';
 import { of } from 'rxjs';
 import { LogType } from '../data-access/enums/log-type';
 import { LogsComponent } from '../ui/logs/logs.component';
+import { SetupInfoComponent } from '../ui/setup-info/setup-info.component';
+import { WebsocketService } from '../data-access/services/websocket/websocket.service';
 
 describe('ClientComponent', () => {
   let component: ClientComponent;
   let fixture: ComponentFixture<ClientComponent>;
   let loggerService: LoggerService;
+  let websocketService: WebsocketService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ClientComponent],
-      imports: [MockComponents(SetupFormComponent, LogsComponent)],
-      providers: [MockProvider(LoggerService)],
+      imports: [
+        MockComponents(SetupFormComponent, LogsComponent, SetupInfoComponent),
+      ],
+      providers: [MockProviders(LoggerService, WebsocketService)],
     });
     fixture = TestBed.createComponent(ClientComponent);
     component = fixture.componentInstance;
     loggerService = TestBed.inject(LoggerService);
+    websocketService = TestBed.inject(WebsocketService);
   });
 
   it('should create', () => {
@@ -38,40 +42,83 @@ describe('ClientComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display setup-form component if socket is undefined', () => {
-    component.socket = undefined;
+  it('should display setup-form component if showForm is true', () => {
+    component.showForm = true;
     fixture.detectChanges();
     const setupForm = fixture.debugElement.query(
       By.directive(SetupFormComponent)
     );
-    const title = findEl(fixture, 'setupFormTitle');
     expect(setupForm).toBeTruthy();
-    expect(title).toBeTruthy();
   });
 
-  it('should not display setup-form component if socket is defined', () => {
-    component.socket = { id: 'test' } as Socket;
+  it('should not display setup-form component if showForm is false', () => {
+    component.showForm = false;
     fixture.detectChanges();
     const setupForm = fixture.debugElement.query(
       By.directive(SetupFormComponent)
-    );
-    const title = fixture.debugElement.query(
-      By.css(getTestIdSelector('setupFormTitle'))
     );
     expect(setupForm).toBeFalsy();
-    expect(title).toBeFalsy();
   });
 
-  it('should save socketSetup to variable on emit from setup-form', fakeAsync(() => {
+  describe('connect button click', () => {
     const socketSetup: SocketSetup = { url: 'test' };
-    fixture.detectChanges();
-    const setupForm = fixture.debugElement.query(
-      By.directive(SetupFormComponent)
-    );
-    setupForm.triggerEventHandler('submittedData', socketSetup);
-    tick();
-    expect(component.socketSetup).toEqual(socketSetup);
-  }));
+    beforeEach(fakeAsync(() => {
+      component.showForm = true;
+      jest.spyOn(websocketService, 'init');
+      fixture.detectChanges();
+      const setupForm = fixture.debugElement.query(
+        By.directive(SetupFormComponent)
+      );
+      setupForm.triggerEventHandler('submittedData', socketSetup);
+      tick();
+    }));
+
+    it('should save socketSetup to variable on emit from setup-form', () => {
+      expect(component.socketSetup).toEqual(socketSetup);
+    });
+
+    it('should call websocketService.init on click with connect button', () => {
+      expect(websocketService.init).toHaveBeenCalledWith(socketSetup);
+    });
+
+    it('should change showForm to false', () => {
+      expect(component.showForm).toEqual(false);
+    });
+  });
+
+  describe('disconnect button click', () => {
+    const socketSetup = {
+      url: 'test',
+      config: { query: { bearerToken: 'abc' } },
+    };
+    beforeEach(fakeAsync(() => {
+      component.showForm = false;
+      component.socketSetup = socketSetup;
+      fixture.detectChanges();
+      jest.spyOn(websocketService, 'disconnect');
+      const setupInfo = fixture.debugElement.query(
+        By.directive(SetupInfoComponent)
+      );
+      setupInfo.triggerEventHandler('disconnectClicked', true);
+      tick();
+    }));
+
+    it('should call disconnect on websocket service', () => {
+      expect(websocketService.disconnect).toHaveBeenCalled();
+    });
+
+    it('should set showForm to true', () => {
+      expect(component.showForm).toEqual(true);
+    });
+
+    it('should fill form with socketSetup', () => {
+      fixture.detectChanges();
+      const setupForm = fixture.debugElement.query(
+        By.directive(SetupFormComponent)
+      ).componentInstance;
+      expect(setupForm.socketSetup).toEqual(socketSetup);
+    });
+  });
 
   it('should display logs', () => {
     jest
@@ -82,5 +129,21 @@ describe('ClientComponent', () => {
       By.directive(LogsComponent)
     );
     expect(logsComponent).toBeTruthy();
+  });
+
+  it('should display setup-info component if socketSetup is defined', () => {
+    component.showForm = false;
+    component.socketSetup = {
+      url: 'test',
+      config: { query: { bearerToken: 'abc' } },
+    };
+    fixture.detectChanges();
+    const setupInfoComponent = fixture.debugElement.query(
+      By.directive(SetupInfoComponent)
+    );
+    expect(setupInfoComponent).toBeTruthy();
+    expect(setupInfoComponent.componentInstance.socketSetup).toEqual(
+      component.socketSetup
+    );
   });
 });

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -23,13 +23,20 @@ export class SetupFormComponent implements OnInit {
   @Output() submittedData: EventEmitter<SocketSetup> =
     new EventEmitter<SocketSetup>();
   form!: FormGroup;
+  @Input()
+  socketSetup?: SocketSetup | undefined;
 
   constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      url: [null, [Validators.required, wsAddressValidator]],
-      config: [null, jsonValidator],
+      url: [this.socketSetup?.url, [Validators.required, wsAddressValidator]],
+      config: [
+        this.socketSetup?.config
+          ? JSON.stringify(this.socketSetup.config)
+          : null,
+        jsonValidator,
+      ],
     });
   }
 

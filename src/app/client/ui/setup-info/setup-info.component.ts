@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SocketSetup } from '../../data-access/models/socket-setup';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class SetupInfoComponent {
   @Input({ required: true })
   socketSetup!: SocketSetup;
+  @Output()
   disconnectClicked: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   disconnect() {

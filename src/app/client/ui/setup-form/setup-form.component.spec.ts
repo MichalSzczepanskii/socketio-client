@@ -9,6 +9,7 @@ import {
 } from '../../../spec-helper/element.utils';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SocketSetup } from '../../data-access/models/socket-setup';
 
 describe('SetupFormComponent', () => {
   let component: SetupFormComponent;
@@ -90,5 +91,22 @@ describe('SetupFormComponent', () => {
     expect(findEl(fixture, 'urlFieldError').nativeElement.textContent).toEqual(
       'Url is not a valid ws address'
     );
+  });
+
+  it('should fill form with socketSetup if passed as input', () => {
+    const socketSetup: SocketSetup = {
+      url: 'ws://localhost:3000',
+      config: {
+        query: {
+          bearerToken: 'abc',
+        },
+      },
+    };
+    component.socketSetup = socketSetup;
+    fixture.detectChanges();
+    expect(component.form.value).toEqual({
+      url: socketSetup.url,
+      config: JSON.stringify(socketSetup.config),
+    });
   });
 });
