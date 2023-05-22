@@ -121,9 +121,15 @@ describe('ClientComponent', () => {
   });
 
   it('should display logs', () => {
-    jest
-      .spyOn(loggerService, 'getLogs')
-      .mockReturnValue(of([{ type: LogType.INFO, content: 'test message' }]));
+    jest.spyOn(loggerService, 'getLogs').mockReturnValue(
+      of([
+        {
+          date: new Date('2023-05-22 12:00:00'),
+          type: LogType.INFO,
+          content: 'test message',
+        },
+      ])
+    );
     fixture.detectChanges();
     const logsComponent = fixture.debugElement.query(
       By.directive(LogsComponent)

@@ -25,12 +25,15 @@ describe('LoggerService', () => {
     .forEach(logType => {
       const logTypeName = LogType[logType].toLowerCase();
       it(`should add ${logTypeName} to behavior subject`, done => {
+        const date = new Date('2023-05-22 12:00:00');
+        jest.useFakeTimers().setSystemTime(date);
         const log = 'test message';
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         service[logTypeName](log);
         service.getLogs().subscribe(msg => {
           expect(msg[0]).toEqual({
+            date: date,
             type: logType,
             content: log,
           });

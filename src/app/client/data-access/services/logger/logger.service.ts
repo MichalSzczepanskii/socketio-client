@@ -37,6 +37,7 @@ export class LoggerService {
     this.logs$.next(
       this.logs$.getValue().concat([
         {
+          date: new Date(),
           type: type,
           content: message,
         },
