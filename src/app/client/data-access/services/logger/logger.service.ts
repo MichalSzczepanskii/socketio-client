@@ -7,7 +7,7 @@ import { LogType } from '../../enums/log-type';
   providedIn: 'root',
 })
 export class LoggerService {
-  private logs$: BehaviorSubject<Log> = new BehaviorSubject<Log>({} as Log);
+  private logs$: BehaviorSubject<Log[]> = new BehaviorSubject<Log[]>([]);
 
   getLogs() {
     return this.logs$.asObservable();
@@ -34,9 +34,13 @@ export class LoggerService {
   }
 
   private addLog(type: LogType, message: string) {
-    this.logs$.next({
-      type: type,
-      content: message,
-    });
+    this.logs$.next(
+      this.logs$.getValue().concat([
+        {
+          type: type,
+          content: message,
+        },
+      ])
+    );
   }
 }

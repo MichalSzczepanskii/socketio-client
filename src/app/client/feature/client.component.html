@@ -11,6 +11,9 @@
     </div>
     <div>
       <h2>Logs</h2>
+      <ng-container *ngIf='logs$ | async as logs'>
+        <socketio-client-logs [logs]='logs'></socketio-client-logs>
+      </ng-container>
     </div>
   </div>
 </div>

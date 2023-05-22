@@ -19,18 +19,6 @@ describe('LoggerService', () => {
     expect(service.getLogs()).toEqual(service['logs$'].asObservable());
   });
 
-  it('should add log to behavior subject', done => {
-    const log = 'test message';
-    service.log(log);
-    service.getLogs().subscribe(msg => {
-      expect(msg).toEqual({
-        type: LogType.LOG,
-        content: log,
-      });
-      done();
-    });
-  });
-
   Object.values(LogType)
     .filter(logType => !isNaN(+logType))
     .map(logType => +logType)
@@ -42,7 +30,7 @@ describe('LoggerService', () => {
         // @ts-ignore
         service[logTypeName](log);
         service.getLogs().subscribe(msg => {
-          expect(msg).toEqual({
+          expect(msg[0]).toEqual({
             type: logType,
             content: log,
           });

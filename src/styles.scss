@@ -1,4 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+$green:   #198754;
+$cyan:    #0dcaf0;
+$yellow:  #ffc107;
+$red:     #dc3545;
+
 
 html,
 body {
@@ -6,5 +11,30 @@ body {
 }
 body {
   margin: 0;
+}
+
+* {
   font-family: Nunito, 'Helvetica Neue', sans-serif;
+}
+
+.log {
+  font-weight: 500;
+}
+
+.text- {
+  &log {
+    color: black;
+  }
+  &info {
+    color: $cyan;
+  }
+  &error {
+    color: $red;
+  }
+  &warn {
+    color: $yellow;
+  }
+  &success {
+    color: green;
+  }
 }

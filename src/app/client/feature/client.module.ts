@@ -5,6 +5,7 @@ import { ClientRoutingModule } from './client-routing.module';
 import { ClientComponent } from './client.component';
 import { SetupFormComponent } from '../ui/setup-form/setup-form.component';
 import { SpinnerComponent } from '../../shared/ui/spinner/spinner.component';
+import { LogsComponent } from '../ui/logs/logs.component';
 
 @NgModule({
   declarations: [ClientComponent],
@@ -13,6 +14,7 @@ import { SpinnerComponent } from '../../shared/ui/spinner/spinner.component';
     ClientRoutingModule,
     SetupFormComponent,
     SpinnerComponent,
+    LogsComponent,
   ],
 })
 export class ClientModule {}
