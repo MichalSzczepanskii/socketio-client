@@ -7,6 +7,7 @@ import { SetupFormComponent } from '../ui/setup-form/setup-form.component';
 import { SpinnerComponent } from '../../shared/ui/spinner/spinner.component';
 import { LogsComponent } from '../ui/logs/logs.component';
 import { SetupInfoComponent } from '../ui/setup-info/setup-info.component';
+import { SubscriptionFormComponent } from '../ui/subscription-form/subscription-form.component';
 
 @NgModule({
   declarations: [ClientComponent],
@@ -17,6 +18,7 @@ import { SetupInfoComponent } from '../ui/setup-info/setup-info.component';
     SpinnerComponent,
     LogsComponent,
     SetupInfoComponent,
+    SubscriptionFormComponent,
   ],
 })
 export class ClientModule {}

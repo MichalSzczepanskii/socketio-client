@@ -16,6 +16,7 @@ import { LogType } from '../data-access/enums/log-type';
 import { LogsComponent } from '../ui/logs/logs.component';
 import { SetupInfoComponent } from '../ui/setup-info/setup-info.component';
 import { WebsocketService } from '../data-access/services/websocket/websocket.service';
+import { SubscriptionFormComponent } from '../ui/subscription-form/subscription-form.component';
 
 describe('ClientComponent', () => {
   let component: ClientComponent;
@@ -27,7 +28,12 @@ describe('ClientComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ClientComponent],
       imports: [
-        MockComponents(SetupFormComponent, LogsComponent, SetupInfoComponent),
+        MockComponents(
+          SetupFormComponent,
+          LogsComponent,
+          SetupInfoComponent,
+          SubscriptionFormComponent
+        ),
       ],
       providers: [MockProviders(LoggerService, WebsocketService)],
     });
@@ -151,5 +157,18 @@ describe('ClientComponent', () => {
     expect(setupInfoComponent.componentInstance.socketSetup).toEqual(
       component.socketSetup
     );
+  });
+
+  it('should display subscription-form if socketSetup is defined', () => {
+    component.showForm = false;
+    component.socketSetup = {
+      url: 'test',
+      config: { query: { bearerToken: 'abc' } },
+    };
+    fixture.detectChanges();
+    const subscriptionForm = fixture.debugElement.query(
+      By.directive(SubscriptionFormComponent)
+    );
+    expect(subscriptionForm).toBeTruthy();
   });
 });
