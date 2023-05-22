@@ -1,7 +1,9 @@
 <div class="container">
   <div class="column left-column">
-    <h2>Setup</h2>
-    <socketio-client-setup-form></socketio-client-setup-form>
+    <ng-container *ngIf='socket === undefined'>
+      <h2 data-cy='setupFormTitle'>Setup</h2>
+      <socketio-client-setup-form (submittedData)='setSocketSetup($event)'></socketio-client-setup-form>
+    </ng-container>
   </div>
   <div class="column right-column">
     <div>

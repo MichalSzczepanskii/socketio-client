@@ -1,0 +1,10 @@
+<div>
+  <div><strong>URL:</strong> <span data-cy='urlInfo'>{{socketSetup.url}}</span></div>
+  <div><strong>Config:</strong></div>
+  <pre data-cy='configInfo'>
+    {{ socketSetup.config | json }}
+  </pre>
+  <div>
+    <button mat-raised-button color='primary' data-cy='disconnectButton' (click)='disconnect()'>Disconnect</button>
+  </div>
+</div>
