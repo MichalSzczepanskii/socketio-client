@@ -46,6 +46,9 @@ describe('SubscriptionFormComponent', () => {
     expect(findEl(fixture, 'submitButton').properties['disabled']).toBe(false);
     findEl(fixture, 'form').triggerEventHandler('submit', {});
     expect(component.channelSubscribed.emit).toHaveBeenCalledWith(channelName);
+    expect(findEl(fixture, 'channelField').nativeElement.value).toEqual('');
+    expect(component.form.pristine).toEqual(true);
+    expect(component.form.errors).toEqual(null);
   });
 
   it('should not submit an invalid form', () => {

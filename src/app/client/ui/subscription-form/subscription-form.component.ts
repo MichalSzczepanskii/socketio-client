@@ -1,8 +1,15 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
+  NgForm,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -14,7 +21,11 @@ import { MatButtonModule } from '@angular/material/button';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatButtonModule],
   template: `
-    <form [formGroup]="form" data-cy="form" (ngSubmit)="subscribeToChannel()">
+    <form
+      [formGroup]="form"
+      data-cy="form"
+      (ngSubmit)="subscribeToChannel()"
+      #formDirective="ngForm">
       <mat-form-field>
         <mat-label>Channel</mat-label>
         <input
@@ -54,6 +65,8 @@ export class SubscriptionFormComponent implements OnInit {
   @Output() channelSubscribed: EventEmitter<string> =
     new EventEmitter<string>();
   form!: FormGroup;
+  @ViewChild('formDirective') private formDirective!: NgForm;
+
   constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit() {
@@ -65,5 +78,7 @@ export class SubscriptionFormComponent implements OnInit {
   subscribeToChannel() {
     if (this.form.invalid) return;
     this.channelSubscribed.emit(this.form.get('channel')?.value);
+    this.form.reset();
+    this.formDirective.resetForm();
   }
 }
