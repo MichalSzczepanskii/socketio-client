@@ -36,8 +36,18 @@ export class WebsocketService {
         channel: channelName,
         data: data,
       });
-      console.log(`[${channelName}] ${data}`);
     });
+  }
+
+  leaveChannel(channelName: string) {
+    const isChannelSubscribed = this.channels$
+      .getValue()
+      .find(channel => channel === channelName);
+    if (!this.socket || !isChannelSubscribed) return;
+    this.socket.emit('unsubscribe', channelName);
+    this.channels$.next(
+      this.channels$.getValue().filter(channel => channel !== channelName)
+    );
   }
 
   private saveMessage(message: Message) {

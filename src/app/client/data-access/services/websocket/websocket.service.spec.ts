@@ -169,105 +169,132 @@ describe('WebsocketService', () => {
     ]);
   });
 
-  it('should log socket io connect event', () => {
-    mockSocket.on = jest
-      .fn()
-      .mockImplementation(
-        (params = 'connect', callback: (data: string) => void) => {
-          callback('message');
-        }
-      );
-    jest.spyOn(loggerService, 'success');
+  describe('logging', () => {
+    it('should log socket io connect event', () => {
+      mockSocket.on = jest
+        .fn()
+        .mockImplementation(
+          (params = 'connect', callback: (data: string) => void) => {
+            callback('message');
+          }
+        );
+      jest.spyOn(loggerService, 'success');
 
-    (io as jest.Mock).mockReturnValue(mockSocket);
-    service.init(socketSetup);
-    expect(loggerService.success).toHaveBeenCalledWith(
-      'Successfully connected'
-    );
+      (io as jest.Mock).mockReturnValue(mockSocket);
+      service.init(socketSetup);
+      expect(loggerService.success).toHaveBeenCalledWith(
+        'Successfully connected'
+      );
+    });
+
+    it('should log error socket io connect_error event', () => {
+      mockSocket.on = jest
+        .fn()
+        .mockImplementation(
+          (params = 'connect_error', callback: (data: object) => void) => {
+            callback({ message: 'reason' });
+          }
+        );
+      jest.spyOn(loggerService, 'error');
+
+      (io as jest.Mock).mockReturnValue(mockSocket);
+      service.init(socketSetup);
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'Connection error due to reason'
+      );
+    });
+
+    it('should log info socket io reconnect event', () => {
+      mockSocket.on = jest
+        .fn()
+        .mockImplementation(
+          (params = 'reconnect', callback: (data: number) => void) => {
+            callback(5);
+          }
+        );
+      jest.spyOn(loggerService, 'info');
+
+      (io as jest.Mock).mockReturnValue(mockSocket);
+      service.init(socketSetup);
+      expect(loggerService.info).toHaveBeenCalledWith(
+        'Reconnected after 5 attempts'
+      );
+    });
+
+    it('should log warn socket io reconnecting event', () => {
+      mockSocket.on = jest
+        .fn()
+        .mockImplementation(
+          (params = 'reconnecting', callback: (data: number) => void) => {
+            callback(5);
+          }
+        );
+      jest.spyOn(loggerService, 'warn');
+
+      (io as jest.Mock).mockReturnValue(mockSocket);
+      service.init(socketSetup);
+      expect(loggerService.warn).toHaveBeenCalledWith(
+        'Trying to reconnect. Attempt: 5'
+      );
+    });
+
+    it('should log error socket io reconnect_error event', () => {
+      mockSocket.on = jest
+        .fn()
+        .mockImplementation(
+          (params = 'reconnect_error', callback: (data: object) => void) => {
+            callback({ message: 'reason' });
+          }
+        );
+      jest.spyOn(loggerService, 'error');
+
+      (io as jest.Mock).mockReturnValue(mockSocket);
+      service.init(socketSetup);
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'Reconnection error due to reason'
+      );
+    });
+
+    it('should log error socket io reconnect_error event', () => {
+      mockSocket.on = jest
+        .fn()
+        .mockImplementation(
+          (params = 'disconnect', callback: (data: string) => void) => {
+            callback('reason');
+          }
+        );
+      jest.spyOn(loggerService, 'info');
+
+      (io as jest.Mock).mockReturnValue(mockSocket);
+      service.init(socketSetup);
+      expect(loggerService.info).toHaveBeenCalledWith(
+        'Disconnected due to reason'
+      );
+    });
   });
 
-  it('should log error socket io connect_error event', () => {
-    mockSocket.on = jest
-      .fn()
-      .mockImplementation(
-        (params = 'connect_error', callback: (data: object) => void) => {
-          callback({ message: 'reason' });
-        }
-      );
-    jest.spyOn(loggerService, 'error');
-
+  it('should not emit unsubscribe message on leaveChannel if socket is undefined', () => {
+    const channelName = 'events';
     (io as jest.Mock).mockReturnValue(mockSocket);
-    service.init(socketSetup);
-    expect(loggerService.error).toHaveBeenCalledWith(
-      'Connection error due to reason'
-    );
+    service.leaveChannel(channelName);
+    expect(mockSocket.emit).not.toHaveBeenCalled();
   });
 
-  it('should log info socket io reconnect event', () => {
-    mockSocket.on = jest
-      .fn()
-      .mockImplementation(
-        (params = 'reconnect', callback: (data: number) => void) => {
-          callback(5);
-        }
-      );
-    jest.spyOn(loggerService, 'info');
-
+  it('should remove channel from list and emit unsubscribe message on leaveChannel', () => {
+    const channelName = 'events';
     (io as jest.Mock).mockReturnValue(mockSocket);
     service.init(socketSetup);
-    expect(loggerService.info).toHaveBeenCalledWith(
-      'Reconnected after 5 attempts'
-    );
+    service.joinChannel(channelName);
+    service.leaveChannel(channelName);
+    expect(mockSocket.emit).toHaveBeenCalledWith('unsubscribe', channelName);
+    expect(service['channels$'].getValue()).not.toContain(channelName);
   });
 
-  it('should log warn socket io reconnecting event', () => {
-    mockSocket.on = jest
-      .fn()
-      .mockImplementation(
-        (params = 'reconnecting', callback: (data: number) => void) => {
-          callback(5);
-        }
-      );
-    jest.spyOn(loggerService, 'warn');
-
+  it('should not emit message on leaveChannel if channel is not subscribed', () => {
+    const channelName = 'events';
     (io as jest.Mock).mockReturnValue(mockSocket);
     service.init(socketSetup);
-    expect(loggerService.warn).toHaveBeenCalledWith(
-      'Trying to reconnect. Attempt: 5'
-    );
-  });
-
-  it('should log error socket io reconnect_error event', () => {
-    mockSocket.on = jest
-      .fn()
-      .mockImplementation(
-        (params = 'reconnect_error', callback: (data: object) => void) => {
-          callback({ message: 'reason' });
-        }
-      );
-    jest.spyOn(loggerService, 'error');
-
-    (io as jest.Mock).mockReturnValue(mockSocket);
-    service.init(socketSetup);
-    expect(loggerService.error).toHaveBeenCalledWith(
-      'Reconnection error due to reason'
-    );
-  });
-
-  it('should log error socket io reconnect_error event', () => {
-    mockSocket.on = jest
-      .fn()
-      .mockImplementation(
-        (params = 'disconnect', callback: (data: string) => void) => {
-          callback('reason');
-        }
-      );
-    jest.spyOn(loggerService, 'info');
-
-    (io as jest.Mock).mockReturnValue(mockSocket);
-    service.init(socketSetup);
-    expect(loggerService.info).toHaveBeenCalledWith(
-      'Disconnected due to reason'
-    );
+    service.leaveChannel(channelName);
+    expect(mockSocket.emit).not.toHaveBeenCalled();
   });
 });

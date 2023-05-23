@@ -9,13 +9,21 @@
     <div
       *ngIf="!showForm && socketSetup !== undefined"
       class="afterSetupContainer">
-      <socketio-client-setup-info
-        [socketSetup]="socketSetup!"
-        (disconnectClicked)="disconnect()"></socketio-client-setup-info>
       <socketio-client-subscription-form
         (channelSubscribed)="
           joinToChannel($event)
         "></socketio-client-subscription-form>
+      <ng-container *ngIf="channels$ | async as channels">
+        <socketio-client-unsubscription-form
+          *ngIf="channels.length > 0"
+          [channels]="channels"
+          (unsubscribedChannel)="
+            leaveChannel($event)
+          "></socketio-client-unsubscription-form>
+      </ng-container>
+      <socketio-client-setup-info
+        [socketSetup]="socketSetup!"
+        (disconnectClicked)="disconnect()"></socketio-client-setup-info>
     </div>
   </div>
   <div class="column right-column">

@@ -20,6 +20,7 @@ import { SubscriptionFormComponent } from '../ui/subscription-form/subscription-
 import { ChannelFilterComponent } from '../ui/channel-filter/channel-filter.component';
 import { Message } from '../data-access/models/message';
 import { MessagesComponent } from '../ui/messages/messages.component';
+import { UnsubscriptionFormComponent } from '../ui/unsubscription-form/unsubscription-form.component';
 
 describe('ClientComponent', () => {
   let component: ClientComponent;
@@ -38,6 +39,10 @@ describe('ClientComponent', () => {
     data: 'test',
   };
   const mockMessages: Message[] = [eventsMessage, testMessage];
+  const mockSocketSetup = {
+    url: 'test',
+    config: { query: { bearerToken: 'abc' } },
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,7 +54,8 @@ describe('ClientComponent', () => {
           SetupInfoComponent,
           SubscriptionFormComponent,
           ChannelFilterComponent,
-          MessagesComponent
+          MessagesComponent,
+          UnsubscriptionFormComponent
         ),
       ],
       providers: [MockProviders(LoggerService, WebsocketService)],
@@ -178,10 +184,7 @@ describe('ClientComponent', () => {
 
   it('should display subscription-form if socketSetup is defined', () => {
     component.showForm = false;
-    component.socketSetup = {
-      url: 'test',
-      config: { query: { bearerToken: 'abc' } },
-    };
+    component.socketSetup = mockSocketSetup;
     fixture.detectChanges();
     const subscriptionForm = fixture.debugElement.query(
       By.directive(SubscriptionFormComponent)
@@ -192,10 +195,7 @@ describe('ClientComponent', () => {
   it('should call websocketService.subscribe with channel emitted from subscription-form', () => {
     jest.spyOn(websocketService, 'joinChannel');
     component.showForm = false;
-    component.socketSetup = {
-      url: 'test',
-      config: { query: { bearerToken: 'abc' } },
-    };
+    component.socketSetup = mockSocketSetup;
     fixture.detectChanges();
     const subscriptionForm = fixture.debugElement.query(
       By.directive(SubscriptionFormComponent)
@@ -278,5 +278,41 @@ describe('ClientComponent', () => {
       By.directive(MessagesComponent)
     );
     expect(messagesComponent).toBeTruthy();
+  });
+
+  it('should display unsubscription form if there is channel subscribed', () => {
+    component.showForm = false;
+    component.socketSetup = mockSocketSetup;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
+    fixture.detectChanges();
+    const unsubscriptionForm = fixture.debugElement.query(
+      By.directive(UnsubscriptionFormComponent)
+    );
+    expect(unsubscriptionForm).toBeTruthy();
+  });
+
+  it('should not display unsubscription form if there is no subscribed channel', () => {
+    component.showForm = false;
+    component.socketSetup = mockSocketSetup;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of([]));
+    fixture.detectChanges();
+    const unsubscriptionForm = fixture.debugElement.query(
+      By.directive(UnsubscriptionFormComponent)
+    );
+    expect(unsubscriptionForm).toBeFalsy();
+  });
+
+  it('should leaveChannel on unsubscriptionForm submit', () => {
+    jest.spyOn(websocketService, 'leaveChannel');
+    const channel = 'events';
+    component.showForm = false;
+    component.socketSetup = mockSocketSetup;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
+    fixture.detectChanges();
+    const unsubscriptionForm = fixture.debugElement.query(
+      By.directive(UnsubscriptionFormComponent)
+    );
+    unsubscriptionForm.triggerEventHandler('unsubscribedChannel', channel);
+    expect(websocketService.leaveChannel).toHaveBeenCalledWith(channel);
   });
 });

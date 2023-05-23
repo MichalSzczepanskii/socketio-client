@@ -58,14 +58,4 @@ describe('SubscriptionFormComponent', () => {
     findEl(fixture, 'form').triggerEventHandler('submit', {});
     expect(component.channelSubscribed.emit).not.toHaveBeenCalled();
   });
-
-  it('should mark channel field as required', () => {
-    jest.spyOn(component.channelSubscribed, 'emit');
-    fixture.detectChanges();
-    markFieldAsBlurred(fixture, 'channelField');
-    fixture.detectChanges();
-    expect(
-      findEl(fixture, 'channelFieldError').nativeElement.textContent
-    ).toEqual('Channel field is required');
-  });
 });

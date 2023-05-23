@@ -1,11 +1,15 @@
 import {
   Component,
   EventEmitter,
+  Input,
   OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
 import {
   FormBuilder,
   FormGroup,
@@ -13,26 +17,30 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'socketio-client-subscription-form',
+  selector: 'socketio-client-unsubscription-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+  ],
   template: `
     <form
       [formGroup]="form"
+      (ngSubmit)="unsubscribeChannel()"
       data-cy="form"
-      (ngSubmit)="subscribeToChannel()"
       #formDirective="ngForm">
       <mat-form-field>
         <mat-label>Channel</mat-label>
-        <input
-          type="text"
-          matInput
-          data-cy="channelField"
-          formControlName="channel" />
+        <mat-select formControlName="channel">
+          <mat-option *ngFor="let channel of channels" [value]="channel">{{
+            channel
+          }}</mat-option>
+        </mat-select>
       </mat-form-field>
       <div>
         <button
@@ -41,7 +49,7 @@ import { MatButtonModule } from '@angular/material/button';
           color="primary"
           data-cy="submitButton"
           [disabled]="form.invalid">
-          Subscribe
+          Unsubscribe
         </button>
       </div>
     </form>
@@ -54,11 +62,14 @@ import { MatButtonModule } from '@angular/material/button';
     `,
   ],
 })
-export class SubscriptionFormComponent implements OnInit {
-  @Output() channelSubscribed: EventEmitter<string> =
-    new EventEmitter<string>();
+export class UnsubscriptionFormComponent implements OnInit {
+  @Input({ required: true })
+  channels!: string[];
+  @Output()
+  unsubscribedChannel: EventEmitter<string> = new EventEmitter<string>();
+  @ViewChild('formDirective')
+  private formDirective!: NgForm;
   form!: FormGroup;
-  @ViewChild('formDirective') private formDirective!: NgForm;
 
   constructor(private formBuilder: FormBuilder) {}
 
@@ -68,10 +79,10 @@ export class SubscriptionFormComponent implements OnInit {
     });
   }
 
-  subscribeToChannel() {
+  unsubscribeChannel() {
     if (this.form.invalid) return;
-    this.channelSubscribed.emit(this.form.get('channel')?.value);
+    this.unsubscribedChannel.emit(this.form.value['channel']);
     this.form.reset();
-    this.formDirective.resetForm();
+    this.formDirective.resetForm('');
   }
 }

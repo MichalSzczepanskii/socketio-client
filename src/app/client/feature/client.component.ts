@@ -43,6 +43,10 @@ export class ClientComponent implements OnInit {
     this.websocketService.joinChannel(channelName);
   }
 
+  leaveChannel(channelName: string) {
+    this.websocketService.leaveChannel(channelName);
+  }
+
   filterChannelMessage(channel: string) {
     this.messages$ = iif(
       () => channel === 'All',
