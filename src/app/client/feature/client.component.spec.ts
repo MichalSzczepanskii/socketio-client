@@ -171,4 +171,20 @@ describe('ClientComponent', () => {
     );
     expect(subscriptionForm).toBeTruthy();
   });
+
+  it('should call websocketService.subscribe with channel emitted from subscription-form', () => {
+    jest.spyOn(websocketService, 'joinChannel');
+    component.showForm = false;
+    component.socketSetup = {
+      url: 'test',
+      config: { query: { bearerToken: 'abc' } },
+    };
+    fixture.detectChanges();
+    const subscriptionForm = fixture.debugElement.query(
+      By.directive(SubscriptionFormComponent)
+    );
+    const channelName = 'events';
+    subscriptionForm.triggerEventHandler('channelSubscribed', channelName);
+    expect(websocketService.joinChannel).toHaveBeenCalledWith(channelName);
+  });
 });

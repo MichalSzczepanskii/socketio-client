@@ -1,12 +1,21 @@
 <div class="container">
   <div class="column left-column">
-    <h2 data-cy='setupFormTitle'>Setup</h2>
-    <ng-container *ngIf='showForm'>
-      <socketio-client-setup-form (submittedData)='connectToSocket($event)' [socketSetup]='socketSetup'></socketio-client-setup-form>
+    <h2 data-cy="setupFormTitle">Setup</h2>
+    <ng-container *ngIf="showForm">
+      <socketio-client-setup-form
+        (submittedData)="connectToSocket($event)"
+        [socketSetup]="socketSetup"></socketio-client-setup-form>
     </ng-container>
-    <div *ngIf='!showForm && socketSetup !== undefined' class='afterSetupContainer'>
-      <socketio-client-setup-info [socketSetup]='socketSetup!' (disconnectClicked)='disconnect()'></socketio-client-setup-info>
-      <socketio-client-subscription-form></socketio-client-subscription-form>
+    <div
+      *ngIf="!showForm && socketSetup !== undefined"
+      class="afterSetupContainer">
+      <socketio-client-setup-info
+        [socketSetup]="socketSetup!"
+        (disconnectClicked)="disconnect()"></socketio-client-setup-info>
+      <socketio-client-subscription-form
+        (channelSubscribed)="
+          joinToChannel($event)
+        "></socketio-client-subscription-form>
     </div>
   </div>
   <div class="column right-column">
@@ -15,8 +24,8 @@
     </div>
     <div>
       <h2>Logs</h2>
-      <ng-container *ngIf='logs$ | async as logs'>
-        <socketio-client-logs [logs]='logs'></socketio-client-logs>
+      <ng-container *ngIf="logs$ | async as logs">
+        <socketio-client-logs [logs]="logs"></socketio-client-logs>
       </ng-container>
     </div>
   </div>

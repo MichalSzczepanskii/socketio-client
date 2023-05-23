@@ -33,4 +33,8 @@ export class ClientComponent implements OnInit {
     this.websocketService.disconnect();
     this.showForm = true;
   }
+
+  joinToChannel(channelName: string) {
+    this.websocketService.joinChannel(channelName);
+  }
 }
