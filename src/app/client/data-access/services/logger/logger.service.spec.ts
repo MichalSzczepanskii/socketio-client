@@ -41,4 +41,25 @@ describe('LoggerService', () => {
         });
       });
     });
+
+  it('should add new log at the top of the array', () => {
+    const date = new Date('2023-05-22 12:00:00');
+    jest.useFakeTimers().setSystemTime(date);
+    const firstLog = 'first log';
+    const secondLog = 'second log';
+    (service as any).addLog(LogType.LOG, firstLog);
+    (service as any).addLog(LogType.LOG, secondLog);
+    expect(service['logs$'].getValue()).toEqual([
+      {
+        date: date,
+        type: LogType.LOG,
+        content: secondLog,
+      },
+      {
+        date: date,
+        type: LogType.LOG,
+        content: firstLog,
+      },
+    ]);
+  });
 });

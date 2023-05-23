@@ -35,13 +35,13 @@ export class LoggerService {
 
   private addLog(type: LogType, message: string) {
     this.logs$.next(
-      this.logs$.getValue().concat([
+      [
         {
           date: new Date(),
           type: type,
           content: message,
         },
-      ])
+      ].concat(this.logs$.getValue())
     );
   }
 }
