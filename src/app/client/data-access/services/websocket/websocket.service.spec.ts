@@ -227,4 +227,21 @@ describe('WebsocketService', () => {
       'Reconnection error due to reason'
     );
   });
+
+  it('should log error socket io reconnect_error event', () => {
+    mockSocket.on = jest
+      .fn()
+      .mockImplementation(
+        (params = 'disconnect', callback: (data: string) => void) => {
+          callback('reason');
+        }
+      );
+    jest.spyOn(loggerService, 'info');
+
+    (io as jest.Mock).mockReturnValue(mockSocket);
+    service.init(socketSetup);
+    expect(loggerService.info).toHaveBeenCalledWith(
+      'Disconnected due to reason'
+    );
+  });
 });

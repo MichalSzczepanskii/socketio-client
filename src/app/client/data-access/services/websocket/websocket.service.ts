@@ -58,6 +58,10 @@ export class WebsocketService {
     this.socket.on('reconnect_error', err => {
       this.loggerService.error(`Reconnection error due to ${err.message}`);
     });
+
+    this.socket.on('disconnect', reason => {
+      this.loggerService.info(`Disconnected due to ${reason}`);
+    });
   }
 
   disconnect() {
