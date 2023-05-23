@@ -3,27 +3,30 @@
     <h2 data-cy="setupFormTitle">Setup</h2>
     <ng-container *ngIf="showForm">
       <socketio-client-setup-form
+        *ngIf="showForm"
         (submittedData)="connectToSocket($event)"
-        [socketSetup]="socketSetup"></socketio-client-setup-form>
+        [socketSetup]="socketSetup$ | async"></socketio-client-setup-form>
     </ng-container>
     <div
-      *ngIf="!showForm && socketSetup !== undefined"
+      *ngIf="socketSetup$ | async as socketSetup"
       class="afterSetupContainer">
-      <socketio-client-subscription-form
-        (channelSubscribed)="
-          joinToChannel($event)
-        "></socketio-client-subscription-form>
-      <ng-container *ngIf="channels$ | async as channels">
-        <socketio-client-unsubscription-form
-          *ngIf="channels.length > 0"
-          [channels]="channels"
-          (unsubscribedChannel)="
-            leaveChannel($event)
-          "></socketio-client-unsubscription-form>
+      <ng-container *ngIf="!showForm && !!socketSetup">
+        <socketio-client-subscription-form
+          (channelSubscribed)="
+            joinToChannel($event)
+          "></socketio-client-subscription-form>
+        <ng-container *ngIf="channels$ | async as channels">
+          <socketio-client-unsubscription-form
+            *ngIf="channels.length > 0"
+            [channels]="channels"
+            (unsubscribedChannel)="
+              leaveChannel($event)
+            "></socketio-client-unsubscription-form>
+        </ng-container>
+        <socketio-client-setup-info
+          [socketSetup]="socketSetup!"
+          (disconnectClicked)="disconnect()"></socketio-client-setup-info>
       </ng-container>
-      <socketio-client-setup-info
-        [socketSetup]="socketSetup!"
-        (disconnectClicked)="disconnect()"></socketio-client-setup-info>
     </div>
   </div>
   <div class="column right-column">

@@ -5,6 +5,7 @@ import { iif, map, Observable } from 'rxjs';
 import { Log } from '../data-access/models/log';
 import { WebsocketService } from '../data-access/services/websocket/websocket.service';
 import { Message } from '../data-access/models/message';
+import { SocketSetupService } from '../data-access/services/socket-setup/socket-setup.service';
 
 @Component({
   selector: 'socketio-client-client',
@@ -13,23 +14,25 @@ import { Message } from '../data-access/models/message';
 })
 export class ClientComponent implements OnInit {
   showForm = true;
-  socketSetup?: SocketSetup;
+  socketSetup$!: Observable<SocketSetup | null>;
   logs$!: Observable<Log[]>;
   channels$!: Observable<string[]>;
   messages$!: Observable<Message[]>;
 
   constructor(
     private loggerService: LoggerService,
-    private websocketService: WebsocketService
+    private websocketService: WebsocketService,
+    private socketSetupService: SocketSetupService
   ) {}
   ngOnInit() {
     this.logs$ = this.loggerService.getLogs();
     this.channels$ = this.websocketService.getChannels();
     this.messages$ = this.websocketService.getMessages();
+    this.socketSetup$ = this.socketSetupService.getSocketSetup();
   }
 
   connectToSocket(socketSetup: SocketSetup) {
-    this.socketSetup = socketSetup;
+    this.socketSetupService.saveSocketSetup(socketSetup);
     this.websocketService.init(socketSetup);
     this.showForm = false;
   }

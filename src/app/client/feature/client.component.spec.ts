@@ -21,12 +21,14 @@ import { ChannelFilterComponent } from '../ui/channel-filter/channel-filter.comp
 import { Message } from '../data-access/models/message';
 import { MessagesComponent } from '../ui/messages/messages.component';
 import { UnsubscriptionFormComponent } from '../ui/unsubscription-form/unsubscription-form.component';
+import { SocketSetupService } from '../data-access/services/socket-setup/socket-setup.service';
 
 describe('ClientComponent', () => {
   let component: ClientComponent;
   let fixture: ComponentFixture<ClientComponent>;
   let loggerService: LoggerService;
   let websocketService: WebsocketService;
+  let socketSetupService: SocketSetupService;
 
   const eventsMessage: Message = {
     date: new Date(),
@@ -58,12 +60,15 @@ describe('ClientComponent', () => {
           UnsubscriptionFormComponent
         ),
       ],
-      providers: [MockProviders(LoggerService, WebsocketService)],
+      providers: [
+        MockProviders(LoggerService, WebsocketService, SocketSetupService),
+      ],
     });
     fixture = TestBed.createComponent(ClientComponent);
     component = fixture.componentInstance;
     loggerService = TestBed.inject(LoggerService);
     websocketService = TestBed.inject(WebsocketService);
+    socketSetupService = TestBed.inject(SocketSetupService);
   });
 
   it('should create', () => {
@@ -94,6 +99,7 @@ describe('ClientComponent', () => {
     beforeEach(fakeAsync(() => {
       component.showForm = true;
       jest.spyOn(websocketService, 'init');
+      jest.spyOn(socketSetupService, 'saveSocketSetup');
       fixture.detectChanges();
       const setupForm = fixture.debugElement.query(
         By.directive(SetupFormComponent)
@@ -103,7 +109,9 @@ describe('ClientComponent', () => {
     }));
 
     it('should save socketSetup to variable on emit from setup-form', () => {
-      expect(component.socketSetup).toEqual(socketSetup);
+      expect(socketSetupService.saveSocketSetup).toHaveBeenCalledWith(
+        socketSetup
+      );
     });
 
     it('should call websocketService.init on click with connect button', () => {
@@ -121,8 +129,10 @@ describe('ClientComponent', () => {
       config: { query: { bearerToken: 'abc' } },
     };
     beforeEach(fakeAsync(() => {
+      jest
+        .spyOn(socketSetupService, 'getSocketSetup')
+        .mockReturnValue(of(socketSetup));
       component.showForm = false;
-      component.socketSetup = socketSetup;
       fixture.detectChanges();
       jest.spyOn(websocketService, 'disconnect');
       const setupInfo = fixture.debugElement.query(
@@ -167,24 +177,25 @@ describe('ClientComponent', () => {
   });
 
   it('should display setup-info component if socketSetup is defined', () => {
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
     component.showForm = false;
-    component.socketSetup = {
-      url: 'test',
-      config: { query: { bearerToken: 'abc' } },
-    };
     fixture.detectChanges();
     const setupInfoComponent = fixture.debugElement.query(
       By.directive(SetupInfoComponent)
     );
     expect(setupInfoComponent).toBeTruthy();
     expect(setupInfoComponent.componentInstance.socketSetup).toEqual(
-      component.socketSetup
+      mockSocketSetup
     );
   });
 
   it('should display subscription-form if socketSetup is defined', () => {
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
     component.showForm = false;
-    component.socketSetup = mockSocketSetup;
     fixture.detectChanges();
     const subscriptionForm = fixture.debugElement.query(
       By.directive(SubscriptionFormComponent)
@@ -194,8 +205,10 @@ describe('ClientComponent', () => {
 
   it('should call websocketService.subscribe with channel emitted from subscription-form', () => {
     jest.spyOn(websocketService, 'joinChannel');
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
     component.showForm = false;
-    component.socketSetup = mockSocketSetup;
     fixture.detectChanges();
     const subscriptionForm = fixture.debugElement.query(
       By.directive(SubscriptionFormComponent)
@@ -281,8 +294,10 @@ describe('ClientComponent', () => {
   });
 
   it('should display unsubscription form if there is channel subscribed', () => {
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
     component.showForm = false;
-    component.socketSetup = mockSocketSetup;
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
     fixture.detectChanges();
     const unsubscriptionForm = fixture.debugElement.query(
@@ -292,8 +307,10 @@ describe('ClientComponent', () => {
   });
 
   it('should not display unsubscription form if there is no subscribed channel', () => {
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
     component.showForm = false;
-    component.socketSetup = mockSocketSetup;
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of([]));
     fixture.detectChanges();
     const unsubscriptionForm = fixture.debugElement.query(
@@ -303,10 +320,12 @@ describe('ClientComponent', () => {
   });
 
   it('should leaveChannel on unsubscriptionForm submit', () => {
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
     jest.spyOn(websocketService, 'leaveChannel');
     const channel = 'events';
     component.showForm = false;
-    component.socketSetup = mockSocketSetup;
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
     fixture.detectChanges();
     const unsubscriptionForm = fixture.debugElement.query(

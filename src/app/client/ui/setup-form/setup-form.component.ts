@@ -24,7 +24,7 @@ export class SetupFormComponent implements OnInit {
     new EventEmitter<SocketSetup>();
   form!: FormGroup;
   @Input()
-  socketSetup?: SocketSetup | undefined;
+  socketSetup?: SocketSetup | null;
 
   constructor(private formBuilder: FormBuilder) {}
 
