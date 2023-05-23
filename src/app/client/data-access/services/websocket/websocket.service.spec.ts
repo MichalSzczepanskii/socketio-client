@@ -5,6 +5,7 @@ import { SocketSetup } from '../../models/socket-setup';
 import { io } from 'socket.io-client';
 import { MockProvider } from 'ng-mocks';
 import { LoggerService } from '../logger/logger.service';
+import { Message } from '../../models/message';
 
 jest.mock('socket.io-client');
 
@@ -107,6 +108,10 @@ describe('WebsocketService', () => {
     expect(service.getChannels()).toEqual(service['channels$'].asObservable());
   });
 
+  it('should return observable with messages', () => {
+    expect(service.getMessages()).toEqual(service['messages$'].asObservable());
+  });
+
   it('should not subscribe to specific channel if socket is undefined', () => {
     const channelName = 'events';
 
@@ -115,7 +120,10 @@ describe('WebsocketService', () => {
     expect(mockSocket.emit).not.toHaveBeenCalled();
   });
 
-  it('should add received message to Subject', done => {
+  it('should add received message to BehaviorSubject', () => {
+    jest.spyOn(service as any, 'saveMessage');
+    const date = new Date('2023-05-23 12:00');
+    jest.useFakeTimers().setSystemTime(date);
     const message = 'test-message';
     mockSocket.on = jest
       .fn()
@@ -125,7 +133,6 @@ describe('WebsocketService', () => {
         }
       );
     const channelName = 'events';
-    jest.spyOn(service.message$, 'next');
 
     (io as jest.Mock).mockReturnValue(mockSocket);
 
@@ -135,12 +142,31 @@ describe('WebsocketService', () => {
       channelName,
       expect.any(Function)
     );
-    expect(service.message$.next).toHaveBeenCalledWith(message);
 
-    service.message$.asObservable().subscribe(data => {
-      expect(data).toEqual(message);
-      done();
+    expect((service as any).saveMessage).toHaveBeenCalledWith({
+      date: date,
+      channel: channelName,
+      data: message,
     });
+  });
+
+  it('should add message at the top of the array in BehaviourSubject', () => {
+    const firstMessage: Message = {
+      date: new Date(),
+      channel: 'test',
+      data: 'first message',
+    };
+    const secondMessage: Message = {
+      date: new Date(),
+      channel: 'test',
+      data: 'second message',
+    };
+    (service as any).saveMessage(firstMessage);
+    (service as any).saveMessage(secondMessage);
+    expect(service['messages$'].getValue()).toEqual([
+      secondMessage,
+      firstMessage,
+    ]);
   });
 
   it('should log socket io connect event', () => {

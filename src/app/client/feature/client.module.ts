@@ -4,10 +4,11 @@ import { CommonModule } from '@angular/common';
 import { ClientRoutingModule } from './client-routing.module';
 import { ClientComponent } from './client.component';
 import { SetupFormComponent } from '../ui/setup-form/setup-form.component';
-import { SpinnerComponent } from '../../shared/ui/spinner/spinner.component';
 import { LogsComponent } from '../ui/logs/logs.component';
 import { SetupInfoComponent } from '../ui/setup-info/setup-info.component';
 import { SubscriptionFormComponent } from '../ui/subscription-form/subscription-form.component';
+import { ChannelFilterComponent } from '../ui/channel-filter/channel-filter.component';
+import { MessagesComponent } from '../ui/messages/messages.component';
 
 @NgModule({
   declarations: [ClientComponent],
@@ -15,10 +16,11 @@ import { SubscriptionFormComponent } from '../ui/subscription-form/subscription-
     CommonModule,
     ClientRoutingModule,
     SetupFormComponent,
-    SpinnerComponent,
     LogsComponent,
     SetupInfoComponent,
     SubscriptionFormComponent,
+    ChannelFilterComponent,
+    MessagesComponent,
   ],
 })
 export class ClientModule {}

@@ -21,6 +21,18 @@
   <div class="column right-column">
     <div>
       <h2>Messages</h2>
+      <ng-container *ngIf="channels$ | async as channels">
+        <socketio-client-channel-filter
+          *ngIf="channels.length > 0"
+          [channels]="channels"
+          (selectedChannel)="
+            filterChannelMessage($event)
+          "></socketio-client-channel-filter>
+      </ng-container>
+      <ng-container *ngIf="messages$ | async as messages">
+        <socketio-client-messages
+          [messages]="messages"></socketio-client-messages>
+      </ng-container>
     </div>
     <div>
       <h2>Logs</h2>

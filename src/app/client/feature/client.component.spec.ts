@@ -17,12 +17,27 @@ import { LogsComponent } from '../ui/logs/logs.component';
 import { SetupInfoComponent } from '../ui/setup-info/setup-info.component';
 import { WebsocketService } from '../data-access/services/websocket/websocket.service';
 import { SubscriptionFormComponent } from '../ui/subscription-form/subscription-form.component';
+import { ChannelFilterComponent } from '../ui/channel-filter/channel-filter.component';
+import { Message } from '../data-access/models/message';
+import { MessagesComponent } from '../ui/messages/messages.component';
 
 describe('ClientComponent', () => {
   let component: ClientComponent;
   let fixture: ComponentFixture<ClientComponent>;
   let loggerService: LoggerService;
   let websocketService: WebsocketService;
+
+  const eventsMessage: Message = {
+    date: new Date(),
+    channel: 'events',
+    data: 'test',
+  };
+  const testMessage = {
+    date: new Date(),
+    channel: 'test',
+    data: 'test',
+  };
+  const mockMessages: Message[] = [eventsMessage, testMessage];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -32,7 +47,9 @@ describe('ClientComponent', () => {
           SetupFormComponent,
           LogsComponent,
           SetupInfoComponent,
-          SubscriptionFormComponent
+          SubscriptionFormComponent,
+          ChannelFilterComponent,
+          MessagesComponent
         ),
       ],
       providers: [MockProviders(LoggerService, WebsocketService)],
@@ -186,5 +203,80 @@ describe('ClientComponent', () => {
     const channelName = 'events';
     subscriptionForm.triggerEventHandler('channelSubscribed', channelName);
     expect(websocketService.joinChannel).toHaveBeenCalledWith(channelName);
+  });
+
+  it('should display channel-filter if there is at least one channel subscribed', () => {
+    jest
+      .spyOn(websocketService, 'getChannels')
+      .mockReturnValue(of(['events', 'test']));
+    fixture.detectChanges();
+    const channelFilter = fixture.debugElement.query(
+      By.directive(ChannelFilterComponent)
+    );
+    expect(channelFilter).toBeTruthy();
+  });
+
+  it('should not display channel-filter if there is no channel subscribed', () => {
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of([]));
+    fixture.detectChanges();
+    const channelFilter = fixture.debugElement.query(
+      By.directive(ChannelFilterComponent)
+    );
+    expect(channelFilter).toBeFalsy();
+  });
+
+  describe('message filtering', () => {
+    beforeEach(() => {
+      jest
+        .spyOn(websocketService, 'getChannels')
+        .mockReturnValue(of(['events', 'test']));
+      jest
+        .spyOn(websocketService, 'getMessages')
+        .mockReturnValue(of(mockMessages));
+    });
+
+    it('should set messages to all messages', done => {
+      fixture.detectChanges();
+      component.messages$.subscribe(messages => {
+        expect(messages).toEqual(mockMessages);
+        done();
+      });
+    });
+
+    it('should filter messages based on emit from channel-filter', done => {
+      fixture.detectChanges();
+      const channelFilter = fixture.debugElement.query(
+        By.directive(ChannelFilterComponent)
+      );
+      channelFilter.triggerEventHandler('selectedChannel', 'events');
+      component.messages$.subscribe(messages => {
+        expect(messages).toEqual([eventsMessage]);
+        done();
+      });
+    });
+
+    it('should return all messages after switching back to all', done => {
+      fixture.detectChanges();
+      component.filterChannelMessage('events');
+      const channelFilter = fixture.debugElement.query(
+        By.directive(ChannelFilterComponent)
+      );
+      channelFilter.triggerEventHandler('selectedChannel', 'All');
+      component.messages$.subscribe(messages => {
+        expect(messages).toEqual(mockMessages);
+        done();
+      });
+    });
+  });
+
+  it('should display messages', () => {
+    jest
+      .spyOn(websocketService, 'getMessages')
+      .mockReturnValue(of(mockMessages));
+    fixture.detectChanges();
+    const messagesComponent = fixture.debugElement.query(
+      By.directive(MessagesComponent)
+    );
+    expect(messagesComponent).toBeTruthy();
   });
 });

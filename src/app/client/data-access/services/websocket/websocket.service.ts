@@ -3,13 +3,14 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
 import { SocketSetup } from '../../models/socket-setup';
 import { LoggerService } from '../logger/logger.service';
+import { Message } from '../../models/message';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WebsocketService {
   socket?: Socket;
-  message$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  messages$: BehaviorSubject<Message[]> = new BehaviorSubject<Message[]>([]);
   private channels$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(
     []
   );
@@ -30,12 +31,25 @@ export class WebsocketService {
     this.socket.emit('subscribe', channelName);
     this.channels$.next(this.channels$.getValue().concat([channelName]));
     this.socket.on(channelName, data => {
-      this.message$.next(data);
+      this.saveMessage({
+        date: new Date(),
+        channel: channelName,
+        data: data,
+      });
+      console.log(`[${channelName}] ${data}`);
     });
+  }
+
+  private saveMessage(message: Message) {
+    this.messages$.next([message].concat(this.messages$.getValue()));
   }
 
   getChannels() {
     return this.channels$.asObservable();
+  }
+
+  getMessages() {
+    return this.messages$.asObservable();
   }
 
   private listenToClientEvents() {
