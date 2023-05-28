@@ -1,4 +1,5 @@
 @import "~jsoneditor/dist/jsoneditor.min.css";
+@import "prism-themes/themes/prism-one-light.css";
 $green:   #198754;
 $cyan:    #0dcaf0;
 $yellow:  #ffc107;
@@ -44,4 +45,9 @@ body {
 
 .ace_editor.ace-jsoneditor {
   min-height: 20rem;
+}
+
+.token.string {
+  white-space: pre-wrap;
+  word-break: break-all;
 }

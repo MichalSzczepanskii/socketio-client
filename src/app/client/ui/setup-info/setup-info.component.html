@@ -4,10 +4,10 @@
       <strong>URL:</strong> <span data-cy="urlInfo">{{ socketSetup.url }}</span>
     </div>
     <div><strong>Config:</strong></div>
-    <pre data-cy="configInfo" class="jsonConfig">
-    {{ socketSetup.config | json }}
-  </pre
-    >
+    <pre
+      data-cy="configInfo"
+      class="jsonConfig language-json"><code #jsonCode class='language-json'>{{ socketSetup.config | json }}</code>
+  </pre>
   </mat-card-content>
   <mat-card-actions>
     <button
