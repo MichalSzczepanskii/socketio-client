@@ -90,6 +90,5 @@ export class MessageFormComponent implements OnInit {
     });
     this.form.reset();
     this.formDirective.resetForm();
-    console.log(this.formDirective);
   }
 }

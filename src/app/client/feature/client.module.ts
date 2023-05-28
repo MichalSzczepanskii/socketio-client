@@ -11,6 +11,7 @@ import { ChannelFilterComponent } from '../ui/channel-filter/channel-filter.comp
 import { MessagesComponent } from '../ui/messages/messages.component';
 import { UnsubscriptionFormComponent } from '../ui/unsubscription-form/unsubscription-form.component';
 import { MessageFormComponent } from '../ui/message-form/message-form.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [ClientComponent],
@@ -25,6 +26,7 @@ import { MessageFormComponent } from '../ui/message-form/message-form.component'
     MessagesComponent,
     UnsubscriptionFormComponent,
     MessageFormComponent,
+    MatExpansionModule,
   ],
 })
 export class ClientModule {}

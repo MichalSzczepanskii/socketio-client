@@ -11,27 +11,43 @@
       *ngIf="socketSetup$ | async as socketSetup"
       class="afterSetupContainer">
       <ng-container *ngIf="!showForm && !!socketSetup">
-        <socketio-client-subscription-form
-          (channelSubscribed)="
-            joinToChannel($event)
-          "></socketio-client-subscription-form>
-        <ng-container *ngIf="channels$ | async as channels">
-          <ng-container *ngIf="channels.length > 0">
-            <socketio-client-unsubscription-form
-              [channels]="channels"
-              (unsubscribedChannel)="
-                leaveChannel($event)
-              "></socketio-client-unsubscription-form>
-            <socketio-client-message-form
-              [channels]="channels"
-              (messageSent)="
-                sendMessage($event)
-              "></socketio-client-message-form>
-          </ng-container>
-        </ng-container>
         <socketio-client-setup-info
           [socketSetup]="socketSetup!"
           (disconnectClicked)="disconnect()"></socketio-client-setup-info>
+
+        <mat-accordion [multi]="true">
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>Subscription</mat-panel-title>
+            </mat-expansion-panel-header>
+            <socketio-client-subscription-form
+              (channelSubscribed)="joinToChannel($event)">
+            </socketio-client-subscription-form>
+          </mat-expansion-panel>
+
+          <ng-container *ngIf="channels$ | async as channels">
+            <ng-container *ngIf="channels.length > 0">
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>Unsubscription</mat-panel-title>
+                </mat-expansion-panel-header>
+                <socketio-client-unsubscription-form
+                  [channels]="channels"
+                  (unsubscribedChannel)="leaveChannel($event)">
+                </socketio-client-unsubscription-form>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>Send message</mat-panel-title>
+                </mat-expansion-panel-header>
+                <socketio-client-message-form
+                  [channels]="channels"
+                  (messageSent)="sendMessage($event)">
+                </socketio-client-message-form>
+              </mat-expansion-panel>
+            </ng-container>
+          </ng-container>
+        </mat-accordion>
       </ng-container>
     </div>
   </div>

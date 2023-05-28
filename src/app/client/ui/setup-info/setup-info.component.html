@@ -1,10 +1,21 @@
-<div>
-  <div><strong>URL:</strong> <span data-cy='urlInfo'>{{socketSetup.url}}</span></div>
-  <div><strong>Config:</strong></div>
-  <pre data-cy='configInfo' class='jsonConfig'>
+<mat-card>
+  <mat-card-content>
+    <div>
+      <strong>URL:</strong> <span data-cy="urlInfo">{{ socketSetup.url }}</span>
+    </div>
+    <div><strong>Config:</strong></div>
+    <pre data-cy="configInfo" class="jsonConfig">
     {{ socketSetup.config | json }}
-  </pre>
-  <div>
-    <button mat-raised-button color='primary' data-cy='disconnectButton' (click)='disconnect()'>Disconnect</button>
-  </div>
-</div>
+  </pre
+    >
+  </mat-card-content>
+  <mat-card-actions>
+    <button
+      mat-button
+      color="primary"
+      data-cy="disconnectButton"
+      (click)="disconnect()">
+      Disconnect
+    </button>
+  </mat-card-actions>
+</mat-card>

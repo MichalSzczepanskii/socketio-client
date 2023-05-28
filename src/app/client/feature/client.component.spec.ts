@@ -24,6 +24,11 @@ import { UnsubscriptionFormComponent } from '../ui/unsubscription-form/unsubscri
 import { SocketSetupService } from '../data-access/services/socket-setup/socket-setup.service';
 import { MessageFormComponent } from '../ui/message-form/message-form.component';
 import { SentMessage } from '../data-access/models/sent-message';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatAccordionHarness } from '@angular/material/expansion/testing';
 
 describe('ClientComponent', () => {
   let component: ClientComponent;
@@ -31,6 +36,7 @@ describe('ClientComponent', () => {
   let loggerService: LoggerService;
   let websocketService: WebsocketService;
   let socketSetupService: SocketSetupService;
+  let loader: HarnessLoader;
 
   const eventsMessage: Message = {
     date: new Date(),
@@ -62,12 +68,15 @@ describe('ClientComponent', () => {
           UnsubscriptionFormComponent,
           MessageFormComponent
         ),
+        MatExpansionModule,
+        BrowserAnimationsModule.withConfig({ disableAnimations: true }),
       ],
       providers: [
         MockProviders(LoggerService, WebsocketService, SocketSetupService),
       ],
     });
     fixture = TestBed.createComponent(ClientComponent);
+    loader = TestbedHarnessEnvironment.loader(fixture);
     component = fixture.componentInstance;
     loggerService = TestBed.inject(LoggerService);
     websocketService = TestBed.inject(WebsocketService);
@@ -383,5 +392,44 @@ describe('ClientComponent', () => {
     );
     messageForm.triggerEventHandler('messageSent', message);
     expect(websocketService.sendMessage).toHaveBeenCalledWith(message);
+  });
+
+  it('should allow multiple accordions to be open', async () => {
+    component.showForm = false;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
+    fixture.detectChanges();
+    const accordionHarness = await loader.getHarness(MatAccordionHarness);
+    expect(await accordionHarness.isMulti()).toEqual(true);
+  });
+
+  it('should display only one expansion panel if no channel is subscribed', async () => {
+    component.showForm = false;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of([]));
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
+    fixture.detectChanges();
+    const accordionHarness = await loader.getHarness(MatAccordionHarness);
+    const expansionPanels = await accordionHarness.getExpansionPanels();
+    expect(expansionPanels.length).toEqual(1);
+    expect(await expansionPanels[0].getTitle()).toEqual('Subscription');
+  });
+
+  it('should display 3 expansion panels if there is channel subscribed', async () => {
+    component.showForm = false;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
+    fixture.detectChanges();
+    const accordionHarness = await loader.getHarness(MatAccordionHarness);
+    const expansionPanels = await accordionHarness.getExpansionPanels();
+    expect(expansionPanels.length).toEqual(3);
+    expect(await expansionPanels[0].getTitle()).toEqual('Subscription');
+    expect(await expansionPanels[1].getTitle()).toEqual('Unsubscription');
+    expect(await expansionPanels[2].getTitle()).toEqual('Send message');
   });
 });

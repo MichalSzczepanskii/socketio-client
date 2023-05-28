@@ -21,7 +21,6 @@ import { MatButtonModule } from '@angular/material/button';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatButtonModule],
   template: `
-    <h3>Subscribe</h3>
     <form
       [formGroup]="form"
       data-cy="form"
