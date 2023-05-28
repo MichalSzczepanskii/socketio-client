@@ -14,7 +14,14 @@ import { DatePipe, NgClass, NgForOf } from '@angular/common';
       [{{ log.date | date : 'HH:mm:ss' }}] {{ log.content }}
     </div>
   `,
-  styles: [],
+  styles: [
+    `
+      :host {
+        flex: 1;
+        overflow-y: auto;
+      }
+    `,
+  ],
   imports: [NgClass, NgForOf, DatePipe],
 })
 export class LogsComponent {

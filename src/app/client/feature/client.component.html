@@ -52,7 +52,7 @@
     </div>
   </div>
   <div class="column right-column">
-    <div>
+    <div class="logs-container">
       <h2>Messages</h2>
       <ng-container *ngIf="channels$ | async as channels">
         <socketio-client-channel-filter
@@ -67,7 +67,7 @@
           [messages]="messages"></socketio-client-messages>
       </ng-container>
     </div>
-    <div>
+    <div class="logs-container">
       <h2>Logs</h2>
       <ng-container *ngIf="logs$ | async as logs">
         <socketio-client-logs [logs]="logs"></socketio-client-logs>

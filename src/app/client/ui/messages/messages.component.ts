@@ -18,6 +18,10 @@ import { MessageDataPipe } from '../message-data/message-data.pipe';
   `,
   styles: [
     `
+      :host {
+        flex: 1;
+        overflow-y: auto;
+      }
       .bold {
         font-weight: bold;
       }
