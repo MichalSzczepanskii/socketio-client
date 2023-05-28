@@ -8,12 +8,21 @@ import { MessageDataPipe } from '../message-data/message-data.pipe';
   standalone: true,
   imports: [CommonModule, MessageDataPipe],
   template: `
-    <div class="message" *ngFor="let message of messages">
+    <div
+      class="message"
+      *ngFor="let message of messages"
+      [class.bold]="message.hasOwnProperty('sent')">
       [{{ message.date | date : 'HH:mm:ss' }}][{{ message.channel }}]
       {{ message.data | messageData }}
     </div>
   `,
-  styles: [],
+  styles: [
+    `
+      .bold {
+        font-weight: bold;
+      }
+    `,
+  ],
 })
 export class MessagesComponent {
   @Input({ required: true })

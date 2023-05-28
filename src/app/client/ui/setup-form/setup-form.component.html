@@ -9,25 +9,20 @@
       >
     </mat-error>
   </mat-form-field>
-  <mat-form-field>
-    <mat-label>Config</mat-label>
-    <textarea
-      matInput
-      data-cy="configField"
-      rows="10"
-      formControlName="config"></textarea>
-    <mat-error *ngIf="fc['config'].errors" data-cy="configFieldError">
-      <span *ngIf="fc['config'].hasError('invalidJson')"
-        >Config is not a valid json</span
-      >
-    </mat-error>
-  </mat-form-field>
+  <div class="jsonEditorField">
+    <json-editor
+      #editor
+      [options]="jsonEditorOptions"
+      formControlName="config"
+      data-cy="configField">
+    </json-editor>
+  </div>
   <div>
     <button
       mat-raised-button
       color="primary"
       data-cy="submitButton"
-      [disabled]="form.invalid">
+      [disabled]="form.invalid || !editor.isValidJson()">
       Connect
     </button>
   </div>

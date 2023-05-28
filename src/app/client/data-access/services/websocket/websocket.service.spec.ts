@@ -6,6 +6,7 @@ import { io } from 'socket.io-client';
 import { MockProvider } from 'ng-mocks';
 import { LoggerService } from '../logger/logger.service';
 import { Message } from '../../models/message';
+import { SentMessage } from '../../models/sent-message';
 
 jest.mock('socket.io-client');
 
@@ -296,5 +297,34 @@ describe('WebsocketService', () => {
     service.init(socketSetup);
     service.leaveChannel(channelName);
     expect(mockSocket.emit).not.toHaveBeenCalled();
+  });
+
+  it('should send message if socket is defined', () => {
+    jest.spyOn(service as any, 'saveMessage');
+    const message: SentMessage = {
+      date: new Date(),
+      channel: 'test',
+      data: 'test',
+      sent: true,
+    };
+    (io as jest.Mock).mockReturnValue(mockSocket);
+    service.init(socketSetup);
+    service.sendMessage(message);
+    expect(mockSocket.emit).toHaveBeenCalledWith(message.channel, message.data);
+    expect(service['saveMessage']).toHaveBeenCalledWith(message);
+  });
+
+  it('should not send message if socket is undefined', () => {
+    jest.spyOn(service as any, 'saveMessage');
+    const message: SentMessage = {
+      date: new Date(),
+      channel: 'test',
+      data: 'test',
+      sent: true,
+    };
+    (io as jest.Mock).mockReturnValue(mockSocket);
+    service.sendMessage(message);
+    expect(mockSocket.emit).not.toHaveBeenCalled();
+    expect(service['saveMessage']).not.toHaveBeenCalled();
   });
 });

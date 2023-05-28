@@ -16,12 +16,18 @@
             joinToChannel($event)
           "></socketio-client-subscription-form>
         <ng-container *ngIf="channels$ | async as channels">
-          <socketio-client-unsubscription-form
-            *ngIf="channels.length > 0"
-            [channels]="channels"
-            (unsubscribedChannel)="
-              leaveChannel($event)
-            "></socketio-client-unsubscription-form>
+          <ng-container *ngIf="channels.length > 0">
+            <socketio-client-unsubscription-form
+              [channels]="channels"
+              (unsubscribedChannel)="
+                leaveChannel($event)
+              "></socketio-client-unsubscription-form>
+            <socketio-client-message-form
+              [channels]="channels"
+              (messageSent)="
+                sendMessage($event)
+              "></socketio-client-message-form>
+          </ng-container>
         </ng-container>
         <socketio-client-setup-info
           [socketSetup]="socketSetup!"

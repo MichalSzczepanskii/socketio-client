@@ -29,6 +29,7 @@ import {
     ReactiveFormsModule,
   ],
   template: `
+    <h3>Unsubscribe</h3>
     <form
       [formGroup]="form"
       (ngSubmit)="unsubscribeChannel()"

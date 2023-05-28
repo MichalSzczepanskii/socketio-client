@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { SocketSetup } from '../../models/socket-setup';
 import { LoggerService } from '../logger/logger.service';
 import { Message } from '../../models/message';
+import { SentMessage } from '../../models/sent-message';
 
 @Injectable({
   providedIn: 'root',
@@ -62,6 +63,17 @@ export class WebsocketService {
     return this.messages$.asObservable();
   }
 
+  disconnect() {
+    if (!this.socket) return;
+    this.socket.disconnect();
+  }
+
+  sendMessage(message: SentMessage) {
+    if (!this.socket) return;
+    this.socket.emit(message.channel, message.data);
+    this.saveMessage(message);
+  }
+
   private listenToClientEvents() {
     if (!this.socket) return;
     this.socket.on('connect', () => {
@@ -86,10 +98,5 @@ export class WebsocketService {
     this.socket.on('disconnect', reason => {
       this.loggerService.info(`Disconnected due to ${reason}`);
     });
-  }
-
-  disconnect() {
-    if (!this.socket) return;
-    this.socket.disconnect();
   }
 }

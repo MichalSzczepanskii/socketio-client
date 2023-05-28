@@ -1,4 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+@import "~jsoneditor/dist/jsoneditor.min.css";
 $green:   #198754;
 $cyan:    #0dcaf0;
 $yellow:  #ffc107;
@@ -15,6 +15,9 @@ body {
 
 * {
   font-family: Nunito, 'Helvetica Neue', sans-serif;
+}
+.ace_editor * {
+  font-family: consolas, monaco, "lucida console", "courier new", courier, monospace, sans-serif;
 }
 
 .log {
@@ -37,4 +40,8 @@ body {
   &success {
     color: green;
   }
+}
+
+.ace_editor.ace-jsoneditor {
+  min-height: 20rem;
 }

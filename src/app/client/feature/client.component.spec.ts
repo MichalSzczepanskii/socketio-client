@@ -22,6 +22,8 @@ import { Message } from '../data-access/models/message';
 import { MessagesComponent } from '../ui/messages/messages.component';
 import { UnsubscriptionFormComponent } from '../ui/unsubscription-form/unsubscription-form.component';
 import { SocketSetupService } from '../data-access/services/socket-setup/socket-setup.service';
+import { MessageFormComponent } from '../ui/message-form/message-form.component';
+import { SentMessage } from '../data-access/models/sent-message';
 
 describe('ClientComponent', () => {
   let component: ClientComponent;
@@ -57,7 +59,8 @@ describe('ClientComponent', () => {
           SubscriptionFormComponent,
           ChannelFilterComponent,
           MessagesComponent,
-          UnsubscriptionFormComponent
+          UnsubscriptionFormComponent,
+          MessageFormComponent
         ),
       ],
       providers: [
@@ -333,5 +336,52 @@ describe('ClientComponent', () => {
     );
     unsubscriptionForm.triggerEventHandler('unsubscribedChannel', channel);
     expect(websocketService.leaveChannel).toHaveBeenCalledWith(channel);
+  });
+
+  it('should display message form if there is channel subscribed', () => {
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
+    component.showForm = false;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
+    fixture.detectChanges();
+    const messageForm = fixture.debugElement.query(
+      By.directive(MessageFormComponent)
+    );
+    expect(messageForm).toBeTruthy();
+  });
+
+  it('should not display message form if there is no subscribed channel', () => {
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
+    component.showForm = false;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of([]));
+    fixture.detectChanges();
+    const messageForm = fixture.debugElement.query(
+      By.directive(MessageFormComponent)
+    );
+    expect(messageForm).toBeFalsy();
+  });
+
+  it('should send message if message form was submitted', () => {
+    const message: SentMessage = {
+      date: new Date(),
+      channel: 'test',
+      data: { msg: 'test' },
+      sent: true,
+    };
+    jest
+      .spyOn(socketSetupService, 'getSocketSetup')
+      .mockReturnValue(of(mockSocketSetup));
+    jest.spyOn(websocketService, 'sendMessage');
+    component.showForm = false;
+    jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
+    fixture.detectChanges();
+    const messageForm = fixture.debugElement.query(
+      By.directive(MessageFormComponent)
+    );
+    messageForm.triggerEventHandler('messageSent', message);
+    expect(websocketService.sendMessage).toHaveBeenCalledWith(message);
   });
 });

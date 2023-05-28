@@ -5,6 +5,7 @@ import { Message } from '../../data-access/models/message';
 import { By } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
 import { MessageDataPipe } from '../message-data/message-data.pipe';
+import { SentMessage } from '../../data-access/models/sent-message';
 
 describe('MessagesComponent', () => {
   let component: MessagesComponent;
@@ -52,5 +53,18 @@ describe('MessagesComponent', () => {
           )} `
       )
     );
+  });
+
+  it('should display message with bold class if it is instance of SentMessage', () => {
+    const sentMessage: SentMessage = {
+      date: new Date(),
+      channel: 'test',
+      data: { msg: 'test' },
+      sent: true,
+    };
+    component.messages = [sentMessage];
+    fixture.detectChanges();
+    const logs = fixture.debugElement.query(By.css('.message'));
+    expect(logs.classes['bold']).toBeTruthy();
   });
 });

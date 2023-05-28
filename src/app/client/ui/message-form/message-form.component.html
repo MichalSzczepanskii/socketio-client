@@ -1,0 +1,55 @@
+<h3>Send message</h3>
+<form
+  data-cy="form"
+  [formGroup]="form"
+  (ngSubmit)="sendMessage()"
+  #formDirective="ngForm">
+  <mat-form-field>
+    <mat-label>Channel</mat-label>
+    <mat-select formControlName="channel" data-cy="channelField">
+      <mat-option *ngFor="let channel of channels" [value]="channel">{{
+        channel
+      }}</mat-option>
+    </mat-select>
+    <mat-error
+      *ngIf="form.get('channel')?.hasError('required')"
+      data-cy="channelFieldError">
+      Channel field is required
+    </mat-error>
+  </mat-form-field>
+  <div class="field">
+    <mat-radio-group
+      aria-label="Select an option"
+      [(ngModel)]="messageType"
+      [ngModelOptions]="{ standalone: true }">
+      <mat-radio-button value="text">text</mat-radio-button>
+      <mat-radio-button value="json">json</mat-radio-button>
+    </mat-radio-group>
+  </div>
+  <mat-form-field *ngIf="messageType === 'text'">
+    <mat-label> Message </mat-label>
+    <textarea
+      matInput
+      data-cy="messageField"
+      rows="10"
+      formControlName="message"></textarea>
+  </mat-form-field>
+  <div *ngIf="messageType === 'json'" class="field">
+    <json-editor
+      [options]="jsonEditorOptions"
+      formControlName="message"
+      data-cy="messageField"></json-editor>
+  </div>
+  <div>
+    <button
+      type="submit"
+      data-cy="submitButton"
+      mat-raised-button
+      color="primary"
+      [disabled]="
+        form.invalid || (messageType === 'json' && !editor?.isValidJson())
+      ">
+      Send
+    </button>
+  </div>
+</form>

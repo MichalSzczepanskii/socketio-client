@@ -6,6 +6,7 @@ import { Log } from '../data-access/models/log';
 import { WebsocketService } from '../data-access/services/websocket/websocket.service';
 import { Message } from '../data-access/models/message';
 import { SocketSetupService } from '../data-access/services/socket-setup/socket-setup.service';
+import { SentMessage } from '../data-access/models/sent-message';
 
 @Component({
   selector: 'socketio-client-client',
@@ -62,5 +63,9 @@ export class ClientComponent implements OnInit {
           )
         )
     );
+  }
+
+  sendMessage(msg: SentMessage) {
+    this.websocketService.sendMessage(msg);
   }
 }

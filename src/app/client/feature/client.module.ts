@@ -10,6 +10,7 @@ import { SubscriptionFormComponent } from '../ui/subscription-form/subscription-
 import { ChannelFilterComponent } from '../ui/channel-filter/channel-filter.component';
 import { MessagesComponent } from '../ui/messages/messages.component';
 import { UnsubscriptionFormComponent } from '../ui/unsubscription-form/unsubscription-form.component';
+import { MessageFormComponent } from '../ui/message-form/message-form.component';
 
 @NgModule({
   declarations: [ClientComponent],
@@ -23,6 +24,7 @@ import { UnsubscriptionFormComponent } from '../ui/unsubscription-form/unsubscri
     ChannelFilterComponent,
     MessagesComponent,
     UnsubscriptionFormComponent,
+    MessageFormComponent,
   ],
 })
 export class ClientModule {}

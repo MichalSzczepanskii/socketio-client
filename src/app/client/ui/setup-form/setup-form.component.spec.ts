@@ -44,8 +44,9 @@ describe('SetupFormComponent', () => {
     };
     setFieldValue(fixture, 'urlField', url);
     markFieldAsBlurred(fixture, 'urlField');
-    setFieldValue(fixture, 'configField', JSON.stringify(config));
-    markFieldAsBlurred(fixture, 'configField');
+    const configField = findEl(fixture, 'configField');
+    configField.componentInstance.set(config);
+    configField.componentInstance.onChange();
     fixture.detectChanges();
     expect(findEl(fixture, 'submitButton').properties['disabled']).toBe(false);
     findEl(fixture, 'form').triggerEventHandler('submit', {});
@@ -73,14 +74,14 @@ describe('SetupFormComponent', () => {
     );
   });
 
-  it('should mark config field as invalid', () => {
+  it('should mark form as invalid if jsonEditor is empty', async () => {
     fixture.detectChanges();
-    setFieldValue(fixture, 'configField', '{"key": "value');
-    markFieldAsBlurred(fixture, 'configField');
+    setFieldValue(fixture, 'urlField', 'ws://localhost:3000');
+    markFieldAsBlurred(fixture, 'urlField');
+    const configField = findEl(fixture, 'configField');
+    configField.componentInstance.data = '';
     fixture.detectChanges();
-    expect(
-      findEl(fixture, 'configFieldError').nativeElement.textContent
-    ).toEqual('Config is not a valid json');
+    expect(findEl(fixture, 'submitButton').properties['disabled']).toBe(false);
   });
 
   it('should mark url field as invalid if wrong url passed', () => {
@@ -106,7 +107,7 @@ describe('SetupFormComponent', () => {
     fixture.detectChanges();
     expect(component.form.value).toEqual({
       url: socketSetup.url,
-      config: JSON.stringify(socketSetup.config),
+      config: socketSetup.config,
     });
   });
 });
