@@ -1,10 +1,9 @@
-@import "~jsoneditor/dist/jsoneditor.min.css";
-@import "prism-themes/themes/prism-one-light.css";
-$green:   #198754;
-$cyan:    #0dcaf0;
-$yellow:  #ffc107;
-$red:     #dc3545;
-
+@import '~jsoneditor/dist/jsoneditor.min.css';
+@import 'prism-themes/themes/prism-one-light.css';
+$green: #198754;
+$cyan: #0dcaf0;
+$yellow: #ffc107;
+$red: #dc3545;
 
 html,
 body {
@@ -18,7 +17,8 @@ body {
   font-family: Nunito, 'Helvetica Neue', sans-serif;
 }
 .ace_editor * {
-  font-family: consolas, monaco, "lucida console", "courier new", courier, monospace, sans-serif;
+  font-family: consolas, monaco, 'lucida console', 'courier new', courier,
+    monospace, sans-serif;
 }
 
 .log {
