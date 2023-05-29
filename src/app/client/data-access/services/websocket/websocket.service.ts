@@ -11,7 +11,10 @@ import { SentMessage } from '../../models/sent-message';
 })
 export class WebsocketService {
   socket?: Socket;
-  messages$: BehaviorSubject<Message[]> = new BehaviorSubject<Message[]>([]);
+  private messages$: BehaviorSubject<Message[]> = new BehaviorSubject<
+    Message[]
+  >([]);
+  private connected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private channels$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(
     []
   );
@@ -24,6 +27,7 @@ export class WebsocketService {
       this.socket = undefined;
     }
     this.socket = io(socketSetup.url, socketSetup.config);
+    this.connected$.next(true);
     this.listenToClientEvents();
   }
 
@@ -63,9 +67,16 @@ export class WebsocketService {
     return this.messages$.asObservable();
   }
 
+  isConnected() {
+    return this.connected$.asObservable();
+  }
+
   disconnect() {
     if (!this.socket) return;
     this.socket.disconnect();
+    this.connected$.next(false);
+    this.channels$.next([]);
+    this.messages$.next([]);
   }
 
   sendMessage(message: SentMessage) {
@@ -97,6 +108,9 @@ export class WebsocketService {
 
     this.socket.on('disconnect', reason => {
       this.loggerService.info(`Disconnected due to ${reason}`);
+      this.connected$.next(false);
+      this.channels$.next([]);
+      this.messages$.next([]);
     });
   }
 }

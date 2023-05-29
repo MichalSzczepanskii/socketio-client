@@ -49,13 +49,17 @@ describe('WebsocketService', () => {
   });
 
   it('should set socket on init', () => {
+    jest.spyOn(service['connected$'], 'next');
     service.init(socketSetup);
     expect(io).toHaveBeenCalledWith(socketSetup.url, socketSetup.config);
+    expect(service['connected$'].next).toHaveBeenCalledWith(true);
   });
 
   it('should set socket on init without options', () => {
+    jest.spyOn(service['connected$'], 'next');
     service.init({ url: socketSetup.url });
     expect(io).toHaveBeenCalledWith(socketSetup.url, undefined);
+    expect(service['connected$'].next).toHaveBeenCalledWith(true);
   });
 
   it('should call disconnect when init is called second time', () => {
@@ -67,14 +71,22 @@ describe('WebsocketService', () => {
   });
 
   it('should call disconnect if socket is definied', () => {
+    jest.spyOn(service['connected$'], 'next');
+    jest.spyOn(service['channels$'], 'next');
+    jest.spyOn(service['messages$'], 'next');
     service.init(socketSetup);
     service.disconnect();
     expect(mockSocket.disconnect).toHaveBeenCalled();
+    expect(service['connected$'].next).toHaveBeenCalledWith(false);
+    expect(service['channels$'].next).toHaveBeenCalledWith([]);
+    expect(service['messages$'].next).toHaveBeenCalledWith([]);
   });
 
   it('should not call disconnect if socket is undefinied', () => {
+    jest.spyOn(service['connected$'], 'next');
     service.disconnect();
     expect(mockSocket.disconnect).not.toHaveBeenCalled();
+    expect(service['connected$'].next).not.toHaveBeenCalled();
   });
 
   it('should subscribe to specific channel if socket is defined', done => {
@@ -111,6 +123,10 @@ describe('WebsocketService', () => {
 
   it('should return observable with messages', () => {
     expect(service.getMessages()).toEqual(service['messages$'].asObservable());
+  });
+
+  it('should return observable with connected', () => {
+    expect(service.isConnected()).toEqual(service['connected$'].asObservable());
   });
 
   it('should not subscribe to specific channel if socket is undefined', () => {

@@ -1,16 +1,15 @@
 <div class="container">
   <div class="column left-column">
     <h2 data-cy="setupFormTitle">Setup</h2>
-    <ng-container *ngIf="showForm">
+    <ng-container *ngIf="showForm$ | async">
       <socketio-client-setup-form
-        *ngIf="showForm"
         (submittedData)="connectToSocket($event)"
         [socketSetup]="socketSetup$ | async"></socketio-client-setup-form>
     </ng-container>
     <div
       *ngIf="socketSetup$ | async as socketSetup"
       class="afterSetupContainer">
-      <ng-container *ngIf="!showForm && !!socketSetup">
+      <ng-container *ngIf="(showForm$ | async) === false && !!socketSetup">
         <socketio-client-setup-info
           [socketSetup]="socketSetup!"
           (disconnectClicked)="disconnect()"></socketio-client-setup-info>

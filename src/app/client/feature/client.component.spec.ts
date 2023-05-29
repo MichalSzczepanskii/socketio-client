@@ -81,6 +81,7 @@ describe('ClientComponent', () => {
     loggerService = TestBed.inject(LoggerService);
     websocketService = TestBed.inject(WebsocketService);
     socketSetupService = TestBed.inject(SocketSetupService);
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(false));
   });
 
   it('should create', () => {
@@ -89,7 +90,7 @@ describe('ClientComponent', () => {
   });
 
   it('should display setup-form component if showForm is true', () => {
-    component.showForm = true;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(false));
     fixture.detectChanges();
     const setupForm = fixture.debugElement.query(
       By.directive(SetupFormComponent)
@@ -98,7 +99,7 @@ describe('ClientComponent', () => {
   });
 
   it('should not display setup-form component if showForm is false', () => {
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     fixture.detectChanges();
     const setupForm = fixture.debugElement.query(
       By.directive(SetupFormComponent)
@@ -109,7 +110,7 @@ describe('ClientComponent', () => {
   describe('connect button click', () => {
     const socketSetup: SocketSetup = { url: 'test' };
     beforeEach(fakeAsync(() => {
-      component.showForm = true;
+      jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(false));
       jest.spyOn(websocketService, 'init');
       jest.spyOn(socketSetupService, 'saveSocketSetup');
       fixture.detectChanges();
@@ -129,10 +130,6 @@ describe('ClientComponent', () => {
     it('should call websocketService.init on click with connect button', () => {
       expect(websocketService.init).toHaveBeenCalledWith(socketSetup);
     });
-
-    it('should change showForm to false', () => {
-      expect(component.showForm).toEqual(false);
-    });
   });
 
   describe('disconnect button click', () => {
@@ -140,26 +137,24 @@ describe('ClientComponent', () => {
       url: 'test',
       config: { query: { bearerToken: 'abc' } },
     };
-    beforeEach(fakeAsync(() => {
+    beforeEach(() => {
       jest
         .spyOn(socketSetupService, 'getSocketSetup')
         .mockReturnValue(of(socketSetup));
-      component.showForm = false;
+      jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
+      jest.spyOn(websocketService, 'disconnect').mockImplementation(() => {
+        component.showForm$ = of(true);
+      });
       fixture.detectChanges();
-      jest.spyOn(websocketService, 'disconnect');
       const setupInfo = fixture.debugElement.query(
         By.directive(SetupInfoComponent)
       );
       setupInfo.triggerEventHandler('disconnectClicked', true);
-      tick();
-    }));
+      fixture.detectChanges();
+    });
 
     it('should call disconnect on websocket service', () => {
       expect(websocketService.disconnect).toHaveBeenCalled();
-    });
-
-    it('should set showForm to true', () => {
-      expect(component.showForm).toEqual(true);
     });
 
     it('should fill form with socketSetup', () => {
@@ -192,7 +187,7 @@ describe('ClientComponent', () => {
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
       .mockReturnValue(of(mockSocketSetup));
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     fixture.detectChanges();
     const setupInfoComponent = fixture.debugElement.query(
       By.directive(SetupInfoComponent)
@@ -207,7 +202,7 @@ describe('ClientComponent', () => {
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
       .mockReturnValue(of(mockSocketSetup));
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     fixture.detectChanges();
     const subscriptionForm = fixture.debugElement.query(
       By.directive(SubscriptionFormComponent)
@@ -220,7 +215,7 @@ describe('ClientComponent', () => {
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
       .mockReturnValue(of(mockSocketSetup));
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     fixture.detectChanges();
     const subscriptionForm = fixture.debugElement.query(
       By.directive(SubscriptionFormComponent)
@@ -309,7 +304,7 @@ describe('ClientComponent', () => {
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
       .mockReturnValue(of(mockSocketSetup));
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
     fixture.detectChanges();
     const unsubscriptionForm = fixture.debugElement.query(
@@ -322,7 +317,7 @@ describe('ClientComponent', () => {
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
       .mockReturnValue(of(mockSocketSetup));
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of([]));
     fixture.detectChanges();
     const unsubscriptionForm = fixture.debugElement.query(
@@ -337,7 +332,7 @@ describe('ClientComponent', () => {
       .mockReturnValue(of(mockSocketSetup));
     jest.spyOn(websocketService, 'leaveChannel');
     const channel = 'events';
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
     fixture.detectChanges();
     const unsubscriptionForm = fixture.debugElement.query(
@@ -351,7 +346,7 @@ describe('ClientComponent', () => {
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
       .mockReturnValue(of(mockSocketSetup));
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
     fixture.detectChanges();
     const messageForm = fixture.debugElement.query(
@@ -364,7 +359,7 @@ describe('ClientComponent', () => {
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
       .mockReturnValue(of(mockSocketSetup));
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of([]));
     fixture.detectChanges();
     const messageForm = fixture.debugElement.query(
@@ -384,7 +379,7 @@ describe('ClientComponent', () => {
       .spyOn(socketSetupService, 'getSocketSetup')
       .mockReturnValue(of(mockSocketSetup));
     jest.spyOn(websocketService, 'sendMessage');
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
     fixture.detectChanges();
     const messageForm = fixture.debugElement.query(
@@ -395,7 +390,7 @@ describe('ClientComponent', () => {
   });
 
   it('should allow multiple accordions to be open', async () => {
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
@@ -406,7 +401,7 @@ describe('ClientComponent', () => {
   });
 
   it('should display only one expansion panel if no channel is subscribed', async () => {
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of([]));
     jest
       .spyOn(socketSetupService, 'getSocketSetup')
@@ -419,7 +414,7 @@ describe('ClientComponent', () => {
   });
 
   it('should display 3 expansion panels if there is channel subscribed', async () => {
-    component.showForm = false;
+    jest.spyOn(websocketService, 'isConnected').mockReturnValue(of(true));
     jest.spyOn(websocketService, 'getChannels').mockReturnValue(of(['events']));
     jest
       .spyOn(socketSetupService, 'getSocketSetup')

@@ -14,7 +14,7 @@ import { SentMessage } from '../data-access/models/sent-message';
   styleUrls: ['./client.component.scss'],
 })
 export class ClientComponent implements OnInit {
-  showForm = true;
+  showForm$!: Observable<boolean>;
   socketSetup$!: Observable<SocketSetup | null>;
   logs$!: Observable<Log[]>;
   channels$!: Observable<string[]>;
@@ -30,17 +30,18 @@ export class ClientComponent implements OnInit {
     this.channels$ = this.websocketService.getChannels();
     this.messages$ = this.websocketService.getMessages();
     this.socketSetup$ = this.socketSetupService.getSocketSetup();
+    this.showForm$ = this.websocketService
+      .isConnected()
+      .pipe(map(connected => !connected));
   }
 
   connectToSocket(socketSetup: SocketSetup) {
     this.socketSetupService.saveSocketSetup(socketSetup);
     this.websocketService.init(socketSetup);
-    this.showForm = false;
   }
 
   disconnect() {
     this.websocketService.disconnect();
-    this.showForm = true;
   }
 
   joinToChannel(channelName: string) {
