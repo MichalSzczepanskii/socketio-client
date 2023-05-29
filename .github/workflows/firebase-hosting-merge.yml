@@ -8,7 +8,7 @@ name: Deploy to Firebase Hosting on merge
       - main
 jobs:
   build:
-    uses: .github/workflows/buildable.yml
+    uses: ./.github/workflows/buildable.yml
   deploy:
     runs-on: ubuntu-latest
     steps:
