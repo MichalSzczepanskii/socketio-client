@@ -1,8 +1,8 @@
-name: buildable
+name: tests
 on: [workflow_call]
 
 jobs:
-  main:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

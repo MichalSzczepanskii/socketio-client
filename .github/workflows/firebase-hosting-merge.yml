@@ -7,13 +7,17 @@ name: Deploy to Firebase Hosting on merge
     branches:
       - main
 jobs:
-  build:
-    uses: ./.github/workflows/buildable.yml
+  tests:
+    uses: ./.github/workflows/tests.yml
   deploy:
-    needs: [build]
+    needs: [tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: nrwl/nx-set-shas@v3
+      - run: npm ci
+
+      - run: npx nx affected -t build --parallel=3
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
