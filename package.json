@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nx serve --port=4201",
+    "start": "nx serve socketio-client --port=4201 --host=0.0.0.0 --poll 2000",
     "build": "nx build",
     "test": "nx test",
     "test:coverage": "nx affected:test --codeCoverage",
