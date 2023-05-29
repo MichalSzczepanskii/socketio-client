@@ -93,6 +93,13 @@
       "options": {
         "buildTarget": "socketio-client:build"
       }
+    },
+    "deploy": {
+      "executor": "@angular/fire:deploy",
+      "options": {
+        "version": 2,
+        "browserTarget": "socketio-client:build:production"
+      }
     }
   }
 }

@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "socketio-client-2bf1d": {
+      "hosting": {
+        "socketio-client": [
+          "socketio-client-2bf1d"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "socketio-client-2bf1d"
+  }
+}

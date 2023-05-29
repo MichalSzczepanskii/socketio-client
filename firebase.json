@@ -1,0 +1,9 @@
+{
+  "hosting": [
+    {
+      "target": "socketio-client",
+      "public": "dist/socketio-client",
+      "frameworksBackend": {}
+    }
+  ]
+}
