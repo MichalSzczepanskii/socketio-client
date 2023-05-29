@@ -1,6 +1,6 @@
 # Socket.io Client
 
-[![buildable](https://github.com/MichalSzczepanskii/socketio-client/actions/workflows/buildable.yml/badge.svg?branch=main)](https://github.com/MichalSzczepanskii/socketio-client/actions/workflows/buildable.yml)
+[![Deploy to Firebase Hosting on merge](https://github.com/MichalSzczepanskii/socketio-client/actions/workflows/firebase-hosting-merge.yml/badge.svg?branch=main)](https://github.com/MichalSzczepanskii/socketio-client/actions/workflows/firebase-hosting-merge.yml)
 
 Socket.IO Client is a simple client for the socket.io-client built with Angular.
 
@@ -19,6 +19,7 @@ Socket.IO Client is a simple client for the socket.io-client built with Angular.
 - Jest: 29.4.1
 - Socket.io Client: 4.6.1
 - Docker: 20.10.22
+- Angular Fire: 7.6.1
 
 ## Installation
 
