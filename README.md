@@ -2,7 +2,7 @@
 
 [![Deploy to Firebase Hosting on merge](https://github.com/MichalSzczepanskii/socketio-client/actions/workflows/firebase-hosting-merge.yml/badge.svg?branch=main)](https://github.com/MichalSzczepanskii/socketio-client/actions/workflows/firebase-hosting-merge.yml)
 
-Socket.IO Client is a simple client for the socket.io-client built with Angular.
+Socket.IO Client is a simple client for the socket.io-client built with Angular. Deployed to firebase hosting ([link](https://socketio-client-2bf1d.web.app/)).
 
 ## Table of contents
 
@@ -45,7 +45,7 @@ To visit the app: http://localhost:4201
 
 ## Usage
 
-To connect to a websocket, you have to pass the url and optionally the configuration JSON. After a successful connection, you can subscribe to channels.
+To connect to a websocket, you have to pass the url and optionally the configuration JSON. After setup form submission, data is saved to local storage, so you don't have to re-enter it after page refresh. After a successful connection, you can subscribe to channels.
 
 If at least one channel is subscribed you can:
 
