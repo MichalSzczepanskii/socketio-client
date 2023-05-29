@@ -42,7 +42,7 @@ describe('SetupInfoComponent', () => {
       const disconnectButton = findEl(fixture, 'disconnectButton');
       expect(url.nativeElement.textContent).toEqual(socketSetup.url);
       expect(config.nativeElement.textContent).toEqual(
-        '    ' + jsonPipe.transform(socketSetup.config) + '\n  '
+        jsonPipe.transform(socketSetup.config) + '\n  '
       );
       expect(disconnectButton).toBeTruthy();
     });
